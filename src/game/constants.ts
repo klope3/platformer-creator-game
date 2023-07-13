@@ -1,5 +1,6 @@
-export const playerJumpForce = 800,
-  playerMoveSpeed = 270,
-  gravity = 2500,
+export const playerJumpForce = 600,
+  playerMoveSpeed = 170,
+  gravity = 2200,
   gameWidth = 800,
-  gameHeight = 600;
+  gameHeight = 600,
+  tileSize = 16;

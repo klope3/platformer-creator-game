@@ -18,6 +18,7 @@ export function Game() {
           debug: false,
         },
       },
+      zoom: 2,
       pixelArt: true,
       scene: [GameScene],
     });

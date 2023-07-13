@@ -1,5 +1,8 @@
 import { Player } from "./Player";
 import { initAnimations } from "./animations";
+import { tileSize } from "./constants";
+import { testMap } from "./testMap";
+import { tileData } from "./tiles";
 
 export class GameScene extends Phaser.Scene {
   private player?: Player;
@@ -14,23 +17,45 @@ export class GameScene extends Phaser.Scene {
       frameWidth: 16 * 3,
       frameHeight: 16,
     });
-    this.load.image("brick_green", "assets/brick_green.png");
+    this.load.image("tiles", "assets/tiles.png");
   }
 
   create() {
-    const { physics } = this;
-    const platforms = physics.add.staticGroup();
-    for (let i = 0; i < 20; i++) {
-      platforms
-        .create(i * 32 + 16, 16 * 30, "brick_green")
-        .setScale(2)
-        .refreshBody();
+    const map = this.make.tilemap({
+      width: 50,
+      height: 50,
+      tileWidth: 16,
+      tileHeight: 16,
+    });
+    const tileset = map.addTilesetImage("tiles");
+    const layer = map.createBlankLayer("platforms", tileset!);
+    for (const tile of testMap.tiles) {
+      const matchingTileData = tileData.find((data) => tile.type === data.type);
+      if (matchingTileData === undefined) {
+        console.error(
+          "Couldn't find a tilesetIndex for a tile of type " + tile.type
+        );
+        return;
+      }
+      map.putTileAt(
+        matchingTileData.tilesetIndex,
+        tile.position.x,
+        tile.position.y,
+        true,
+        layer!
+      );
     }
+    map.setCollision([0, 1]);
 
     initAnimations(this);
 
-    this.player = new Player(this, 300, 300, "tofuman");
-    physics.add.collider(this.player, platforms);
+    this.player = new Player(
+      this,
+      testMap.playerPosition.x * tileSize + tileSize / 2,
+      testMap.playerPosition.y * tileSize + tileSize / 2,
+      "tofuman"
+    );
+    this.physics.add.collider(this.player, layer!);
     this.cursors = this.input.keyboard?.createCursorKeys();
   }
 
