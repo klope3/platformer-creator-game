@@ -8,9 +8,14 @@ import { tileData } from "./tiles";
 import { tileToPixelPosition } from "./utility";
 
 export class GameScene extends Phaser.Scene {
-  private player?: Player;
-  private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
-  private map?: Phaser.Tilemaps.Tilemap;
+  private _player?: Player;
+  private _cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
+  private _map?: Phaser.Tilemaps.Tilemap;
+  private _lives = 3;
+
+  public get lives(): number {
+    return this._lives;
+  }
 
   constructor() {
     super("game-scene");
@@ -31,28 +36,43 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     initAnimations(this);
-    this.cursors = this.input.keyboard?.createCursorKeys();
+    this._cursors = this.input.keyboard?.createCursorKeys();
 
     const buildMapResult = this.buildMap();
     if (!buildMapResult) return;
+    const { solidLayer } = buildMapResult;
 
-    const placeCharactersResult = this.placeCharacters();
+    const { player, enemies } = this.placeCharacters();
 
-    [placeCharactersResult.player, placeCharactersResult.enemies].forEach(
-      (item) => this.physics.add.collider(item, buildMapResult.solidLayer)
-    );
+    const playerWorldCollider = this.physics.add.collider(player, solidLayer);
+    this.physics.add.collider(enemies, solidLayer);
+
+    const playerEnemyOverlap = this.physics.add.overlap(player, enemies, () => {
+      playerEnemyOverlap.destroy();
+
+      player.die(playerWorldCollider);
+      this._lives--;
+      this.events.emit("removeLife");
+      for (const enemy of enemies.children.entries) {
+        if (!(enemy instanceof Enemy)) continue;
+        enemy.setFrozen(true);
+      }
+      setTimeout(() => {
+        this.scene.restart();
+      }, 3000);
+    });
   }
 
   buildMap() {
     //initialize
-    this.map = this.make.tilemap({
+    this._map = this.make.tilemap({
       width: levelWidth,
       height: levelHeight,
       tileWidth: tileSize,
       tileHeight: tileSize,
     });
-    const tileset = this.map.addTilesetImage(textureKeys.tiles);
-    const layer = this.map.createBlankLayer("platforms", tileset!);
+    const tileset = this._map.addTilesetImage(textureKeys.tiles);
+    const layer = this._map.createBlankLayer("platforms", tileset!);
     //find matching data and place tiles
     for (const tile of testMap.tiles) {
       const matchingTileData = tileData.find((data) => tile.type === data.type);
@@ -62,7 +82,7 @@ export class GameScene extends Phaser.Scene {
         );
         return;
       }
-      this.map.putTileAt(
+      this._map.putTileAt(
         matchingTileData.tilesetIndex,
         tile.position.x,
         tile.position.y,
@@ -74,7 +94,7 @@ export class GameScene extends Phaser.Scene {
     const collisionIndices = tileData
       .map((data) => (data.solid ? data.tilesetIndex : -1))
       .filter((item) => item !== -1);
-    this.map.setCollision(collisionIndices);
+    this._map.setCollision(collisionIndices);
 
     return {
       solidLayer: layer!,
@@ -86,13 +106,13 @@ export class GameScene extends Phaser.Scene {
       testMap.playerPosition.x,
       testMap.playerPosition.y
     );
-    this.player = new Player(
+    this._player = new Player(
       this,
       playerPosition.x,
       playerPosition.y,
-      this.cursors!
+      this._cursors!
     );
-    this.player.setCollideWorldBounds(true);
+    this._player.setCollideWorldBounds(true);
 
     const enemies = this.physics.add.group();
     for (const character of testMap.characters) {
@@ -106,7 +126,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     return {
-      player: this.player!,
+      player: this._player!,
       enemies,
     };
   }

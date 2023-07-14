@@ -7,6 +7,7 @@ import { MovementType } from "./types";
 export class Enemy extends Character {
   private _timer = 0;
   private _moveDirection: MovementType = "left";
+  private _frozen = false;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(
@@ -23,6 +24,10 @@ export class Enemy extends Character {
   protected preUpdate(time: number, delta: number): void {
     super.preUpdate(time, delta);
 
+    if (this._frozen) {
+      this.move("stop");
+      return;
+    }
     this._timer += delta;
     this.move(this._moveDirection);
     if (this._timer > 1000) {
@@ -30,5 +35,9 @@ export class Enemy extends Character {
       if (this._moveDirection === "left") this._moveDirection = "right";
       else this._moveDirection = "left";
     }
+  }
+
+  setFrozen(value: boolean) {
+    this._frozen = true;
   }
 }

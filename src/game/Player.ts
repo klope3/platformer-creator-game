@@ -5,6 +5,7 @@ import { textureKeys } from "./textureData";
 
 export class Player extends Character {
   private _cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
+  private _dead = false;
 
   constructor(
     scene: Phaser.Scene,
@@ -27,13 +28,18 @@ export class Player extends Character {
   }
 
   jump() {
-    if (!this.body?.blocked.down) return;
+    if (!this.body?.blocked.down && !this._dead) return;
     this.setVelocityY(-1 * playerJumpForce);
-    this.anims.play(animationKeys.playerJumping);
+    const animationKey = this._dead
+      ? animationKeys.playerDie
+      : animationKeys.playerJumping;
+    this.anims.play(animationKey);
   }
 
   protected preUpdate(time: number, delta: number) {
     super.preUpdate(time, delta);
+
+    if (this._dead) return;
 
     if (this._cursors?.left.isDown) {
       this.move("left");
@@ -45,5 +51,16 @@ export class Player extends Character {
     if (this._cursors?.up.isDown) {
       this.jump();
     }
+  }
+
+  die(worldCollider: Phaser.Physics.Arcade.Collider) {
+    this._dead = true;
+    this.move("stop");
+    this.body!.enable = false;
+    setTimeout(() => {
+      this.body!.enable = true;
+      this.jump();
+      worldCollider.destroy();
+    }, 1000);
   }
 }

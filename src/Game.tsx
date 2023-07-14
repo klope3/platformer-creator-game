@@ -3,6 +3,7 @@ import Phaser from "phaser";
 import { useEffect } from "react";
 import { gameHeight, gameWidth, gravity } from "./game/constants";
 import { GameScene } from "./game/GameScene";
+import { UIScene } from "./game/UIScene";
 
 export function Game() {
   useEffect(() => {
@@ -20,7 +21,7 @@ export function Game() {
       },
       zoom: 2,
       pixelArt: true,
-      scene: [GameScene],
+      scene: [GameScene, UIScene],
     });
     return () => {
       game.destroy(true, false);

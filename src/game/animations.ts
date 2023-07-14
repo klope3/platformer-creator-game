@@ -4,6 +4,7 @@ export const animationKeys = {
   playerMove: "playerMove",
   playerIdle: "playerIdle",
   playerJumping: "playerJumping",
+  playerDie: "playerDie",
   enemyMove: "enemyMove",
   enemyIdle: "enemyIdle",
 };
@@ -28,6 +29,10 @@ export function initAnimations(scene: Phaser.Scene) {
     {
       key: animationKeys.playerJumping,
       frames: [{ key: textureKeys.player, frame: 1 }],
+    },
+    {
+      key: animationKeys.playerDie,
+      frames: [{ key: textureKeys.player, frame: 6 }],
     },
     {
       key: animationKeys.enemyIdle,
