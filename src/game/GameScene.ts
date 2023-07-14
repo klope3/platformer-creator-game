@@ -1,7 +1,9 @@
+import { Enemy } from "./Enemy";
 import { Player } from "./Player";
 import { initAnimations } from "./animations";
 import { tileSize } from "./constants";
 import { testMap } from "./testMap";
+import { textureData } from "./textureData";
 import { tileData } from "./tiles";
 
 export class GameScene extends Phaser.Scene {
@@ -13,11 +15,16 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.spritesheet("tofuman", "assets/tofuman.png", {
-      frameWidth: 16 * 3,
-      frameHeight: 16,
-    });
-    this.load.image("tiles", "assets/tiles.png");
+    for (const data of textureData) {
+      if (data.type === "sheet") {
+        if (data.frameWidth === undefined || data.frameHeight === undefined)
+          console.error("Bad sprite sheet data!");
+        this.load.spritesheet(data.key, data.path, {
+          frameWidth: data.frameWidth!,
+          frameHeight: data.frameHeight,
+        });
+      } else this.load.image(data.key, data.path);
+    }
   }
 
   create() {
@@ -48,28 +55,22 @@ export class GameScene extends Phaser.Scene {
     map.setCollision([0, 1]);
 
     initAnimations(this);
+    this.cursors = this.input.keyboard?.createCursorKeys();
 
     this.player = new Player(
       this,
       testMap.playerPosition.x * tileSize + tileSize / 2,
       testMap.playerPosition.y * tileSize + tileSize / 2,
-      "tofuman"
+      this.cursors!
     );
-    this.physics.add.collider(this.player, layer!);
-    this.cursors = this.input.keyboard?.createCursorKeys();
-  }
 
-  update() {
-    const { cursors, player } = this;
-    if (cursors?.left.isDown) {
-      player?.move("left");
-    } else if (cursors?.right.isDown) {
-      player?.move("right");
-    } else {
-      player?.move("stop");
-    }
-    if (cursors?.up.isDown) {
-      player?.jump();
-    }
+    const e = new Enemy(
+      this,
+      9 * tileSize + tileSize / 2,
+      3 * tileSize + tileSize / 2
+    );
+
+    this.physics.add.collider(this.player, layer!);
+    this.physics.add.collider(e, layer!);
   }
 }

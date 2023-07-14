@@ -1,12 +1,27 @@
+import { Character } from "./Character";
 import { animationKeys } from "./animations";
 import { playerJumpForce, playerMoveSpeed } from "./constants";
-import { MovementType } from "./types";
+import { textureKeys } from "./textureData";
 
-export class Player extends Phaser.Physics.Arcade.Sprite {
-  private _facingLeft = false;
+export class Player extends Character {
+  private _cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
-    super(scene, x, y, texture);
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys
+  ) {
+    super(
+      scene,
+      x,
+      y,
+      textureKeys.player,
+      playerMoveSpeed,
+      animationKeys.playerMove,
+      animationKeys.playerIdle
+    );
+    this._cursors = cursorKeys;
     scene.add.existing(this);
     scene.physics.add.existing(this).setSize(16, 16).refreshBody();
   }
@@ -14,20 +29,21 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   jump() {
     if (!this.body?.blocked.down) return;
     this.setVelocityY(-1 * playerJumpForce);
-    this.anims.play(animationKeys.jumping);
+    this.anims.play(animationKeys.playerJumping);
   }
 
-  move(direction: MovementType) {
-    let velocity = 0;
-    if (direction === "left") velocity = -1 * playerMoveSpeed;
-    if (direction === "right") velocity = playerMoveSpeed;
+  protected preUpdate(time: number, delta: number) {
+    super.preUpdate(time, delta);
 
-    this.setVelocityX(velocity);
-    this._facingLeft = velocity < 0 || (velocity === 0 && this._facingLeft);
-    this.setFlipX(this._facingLeft);
-
-    if (!this.body?.blocked.down) return;
-    if (velocity !== 0) this.anims.play(animationKeys.move, true);
-    else this.anims.play(animationKeys.idle, true);
+    if (this._cursors?.left.isDown) {
+      this.move("left");
+    } else if (this._cursors?.right.isDown) {
+      this.move("right");
+    } else {
+      this.move("stop");
+    }
+    if (this._cursors?.up.isDown) {
+      this.jump();
+    }
   }
 }

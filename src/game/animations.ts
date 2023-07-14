@@ -1,7 +1,11 @@
+import { textureKeys } from "./textureData";
+
 export const animationKeys = {
-  move: "move",
-  idle: "idle",
-  jumping: "jumping",
+  playerMove: "playerMove",
+  playerIdle: "playerIdle",
+  playerJumping: "playerJumping",
+  enemyMove: "enemyMove",
+  enemyIdle: "enemyIdle",
 };
 
 export function initAnimations(scene: Phaser.Scene) {
@@ -9,18 +13,34 @@ export function initAnimations(scene: Phaser.Scene) {
 
   const animations = [
     {
-      key: animationKeys.move,
-      frames: anims.generateFrameNumbers("tofuman", { start: 1, end: 4 }),
+      key: animationKeys.playerMove,
+      frames: anims.generateFrameNumbers(textureKeys.player, {
+        start: 1,
+        end: 4,
+      }),
       frameRate: 10,
       repeat: -1,
     },
     {
-      key: animationKeys.idle,
-      frames: [{ key: "tofuman", frame: 0 }],
+      key: animationKeys.playerIdle,
+      frames: [{ key: textureKeys.player, frame: 0 }],
     },
     {
-      key: animationKeys.jumping,
-      frames: [{ key: "tofuman", frame: 1 }],
+      key: animationKeys.playerJumping,
+      frames: [{ key: textureKeys.player, frame: 1 }],
+    },
+    {
+      key: animationKeys.enemyIdle,
+      frames: [{ key: textureKeys.enemy, frame: 0 }],
+    },
+    {
+      key: animationKeys.enemyMove,
+      frames: anims.generateFrameNumbers(textureKeys.enemy, {
+        start: 1,
+        end: 4,
+      }),
+      frameRate: 10,
+      repeat: -1,
     },
   ];
   for (const anim of animations) {

@@ -27,3 +27,19 @@ export type Vector2 = {
   x: number;
   y: number;
 };
+
+const characterTypes = ["player", "enemy"] as const;
+const characterTypeSchema = z.enum(characterTypes);
+export type CharacterType = z.infer<typeof characterTypeSchema>;
+export type CharacterData = {
+  type: CharacterType;
+  textureKey: string;
+};
+
+export type TextureData = {
+  key: string;
+  path: string;
+  type: "normal" | "sheet";
+  frameWidth?: number;
+  frameHeight?: number;
+};
