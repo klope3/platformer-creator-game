@@ -4,4 +4,6 @@ export const playerJumpForce = 600,
   gravity = 2200,
   gameWidth = 800,
   gameHeight = 600,
-  tileSize = 16;
+  tileSize = 16,
+  levelWidth = 50,
+  levelHeight = 50;

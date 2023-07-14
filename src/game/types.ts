@@ -11,6 +11,7 @@ export type TileType = z.infer<typeof tileTypeSchema>;
 export type TileData = {
   type: TileType;
   tilesetIndex: number;
+  solid: boolean;
 };
 
 export type LevelTile = {
@@ -21,6 +22,7 @@ export type LevelTile = {
 export type Level = {
   playerPosition: Vector2;
   tiles: LevelTile[];
+  characters: LevelCharacter[];
 };
 
 export type Vector2 = {
@@ -34,6 +36,10 @@ export type CharacterType = z.infer<typeof characterTypeSchema>;
 export type CharacterData = {
   type: CharacterType;
   textureKey: string;
+};
+type LevelCharacter = {
+  type: CharacterType;
+  position: Vector2;
 };
 
 export type TextureData = {

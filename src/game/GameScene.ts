@@ -1,14 +1,16 @@
 import { Enemy } from "./Enemy";
 import { Player } from "./Player";
 import { initAnimations } from "./animations";
-import { tileSize } from "./constants";
+import { levelHeight, levelWidth, tileSize } from "./constants";
 import { testMap } from "./testMap";
-import { textureData } from "./textureData";
+import { textureData, textureKeys } from "./textureData";
 import { tileData } from "./tiles";
+import { tileToPixelPosition } from "./utility";
 
 export class GameScene extends Phaser.Scene {
   private player?: Player;
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
+  private map?: Phaser.Tilemaps.Tilemap;
 
   constructor() {
     super("game-scene");
@@ -28,14 +30,30 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    const map = this.make.tilemap({
-      width: 50,
-      height: 50,
-      tileWidth: 16,
-      tileHeight: 16,
+    initAnimations(this);
+    this.cursors = this.input.keyboard?.createCursorKeys();
+
+    const buildMapResult = this.buildMap();
+    if (!buildMapResult) return;
+
+    const placeCharactersResult = this.placeCharacters();
+
+    [placeCharactersResult.player, placeCharactersResult.enemies].forEach(
+      (item) => this.physics.add.collider(item, buildMapResult.solidLayer)
+    );
+  }
+
+  buildMap() {
+    //initialize
+    this.map = this.make.tilemap({
+      width: levelWidth,
+      height: levelHeight,
+      tileWidth: tileSize,
+      tileHeight: tileSize,
     });
-    const tileset = map.addTilesetImage("tiles");
-    const layer = map.createBlankLayer("platforms", tileset!);
+    const tileset = this.map.addTilesetImage(textureKeys.tiles);
+    const layer = this.map.createBlankLayer("platforms", tileset!);
+    //find matching data and place tiles
     for (const tile of testMap.tiles) {
       const matchingTileData = tileData.find((data) => tile.type === data.type);
       if (matchingTileData === undefined) {
@@ -44,7 +62,7 @@ export class GameScene extends Phaser.Scene {
         );
         return;
       }
-      map.putTileAt(
+      this.map.putTileAt(
         matchingTileData.tilesetIndex,
         tile.position.x,
         tile.position.y,
@@ -52,25 +70,44 @@ export class GameScene extends Phaser.Scene {
         layer!
       );
     }
-    map.setCollision([0, 1]);
+    //set collision
+    const collisionIndices = tileData
+      .map((data) => (data.solid ? data.tilesetIndex : -1))
+      .filter((item) => item !== -1);
+    this.map.setCollision(collisionIndices);
 
-    initAnimations(this);
-    this.cursors = this.input.keyboard?.createCursorKeys();
+    return {
+      solidLayer: layer!,
+    };
+  }
 
+  placeCharacters() {
+    const playerPosition = tileToPixelPosition(
+      testMap.playerPosition.x,
+      testMap.playerPosition.y
+    );
     this.player = new Player(
       this,
-      testMap.playerPosition.x * tileSize + tileSize / 2,
-      testMap.playerPosition.y * tileSize + tileSize / 2,
+      playerPosition.x,
+      playerPosition.y,
       this.cursors!
     );
+    this.player.setCollideWorldBounds(true);
 
-    const e = new Enemy(
-      this,
-      9 * tileSize + tileSize / 2,
-      3 * tileSize + tileSize / 2
-    );
+    const enemies = this.physics.add.group();
+    for (const character of testMap.characters) {
+      const position = tileToPixelPosition(
+        character.position.x,
+        character.position.y
+      );
+      const newCharacter = new Enemy(this, position.x, position.y);
+      newCharacter.setCollideWorldBounds(true);
+      enemies.add(newCharacter);
+    }
 
-    this.physics.add.collider(this.player, layer!);
-    this.physics.add.collider(e, layer!);
+    return {
+      player: this.player!,
+      enemies,
+    };
   }
 }
