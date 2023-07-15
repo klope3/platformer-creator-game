@@ -7,6 +7,7 @@ import { textureKeys } from "./textureData";
 export class Player extends Character {
   private _cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   private _gameScene: GameScene;
+  private _jumpButtonLastFrame = false;
 
   constructor(
     scene: GameScene,
@@ -36,7 +37,7 @@ export class Player extends Character {
     const animationKey = this.dead
       ? animationKeys.playerDie
       : animationKeys.playerJumping;
-    this.anims.play(animationKey);
+    this.anims.play(animationKey, true);
   }
 
   protected preUpdate(time: number, delta: number) {
@@ -46,16 +47,26 @@ export class Player extends Character {
 
     if (!this._gameScene.victory) this.checkWin();
 
-    if (this._cursors?.left.isDown) {
+    this.processInput();
+  }
+
+  processInput() {
+    const cursors = this._cursors;
+    if (!cursors) return;
+    if (cursors.left.isDown) {
       this.move("left");
-    } else if (this._cursors?.right.isDown) {
+    } else if (cursors.right.isDown) {
       this.move("right");
     } else {
       this.move("stop");
     }
-    if (this._cursors?.up.isDown) {
+
+    const curJump = cursors.up.isDown;
+    const jumpPressed = !this._jumpButtonLastFrame && curJump;
+    if (jumpPressed) {
       this.jump();
     }
+    this._jumpButtonLastFrame = curJump;
   }
 
   checkWin() {
