@@ -17,7 +17,8 @@ export class Enemy extends Character {
       textureKeys.enemy,
       enemyMoveSpeed,
       animationKeys.enemyMove,
-      animationKeys.enemyIdle
+      animationKeys.enemyIdle,
+      animationKeys.enemyDie
     );
   }
 
@@ -38,6 +39,6 @@ export class Enemy extends Character {
   }
 
   setFrozen(value: boolean) {
-    this._frozen = true;
+    this._frozen = value;
   }
 }

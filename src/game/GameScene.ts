@@ -1,3 +1,4 @@
+import { Character } from "./Character";
 import { Enemy } from "./Enemy";
 import { Player } from "./Player";
 import { initAnimations } from "./animations";
@@ -11,10 +12,15 @@ export class GameScene extends Phaser.Scene {
   private _player?: Player;
   private _cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   private _map?: Phaser.Tilemaps.Tilemap;
+  private _enemies?: Phaser.Physics.Arcade.Group;
   private _lives = 3;
 
   public get lives(): number {
     return this._lives;
+  }
+
+  public get enemies() {
+    return this._enemies;
   }
 
   constructor() {
@@ -47,24 +53,19 @@ export class GameScene extends Phaser.Scene {
     const playerWorldCollider = this.physics.add.collider(player, solidLayer);
     this.physics.add.collider(enemies, solidLayer);
 
-    const playerEnemyOverlap = this.physics.add.overlap(player, enemies, () => {
-      playerEnemyOverlap.destroy();
-
-      player.die(playerWorldCollider);
-      this._lives--;
-      this.events.emit("loseLife");
-      for (const enemy of enemies.children.entries) {
-        if (!(enemy instanceof Enemy)) continue;
-        enemy.setFrozen(true);
+    const playerEnemyOverlapCollider = this.physics.add.overlap(
+      player,
+      enemies,
+      (player, enemy) => {
+        playerOverlapEnemy(
+          player as Character,
+          enemy as Character,
+          playerEnemyOverlapCollider,
+          playerWorldCollider,
+          this
+        );
       }
-      setTimeout(() => {
-        if (this._lives === 0) {
-          this.doGameOver();
-        } else {
-          this.scene.restart();
-        }
-      }, 3000);
-    });
+    );
   }
 
   buildMap() {
@@ -118,7 +119,7 @@ export class GameScene extends Phaser.Scene {
     );
     this._player.setCollideWorldBounds(true);
 
-    const enemies = this.physics.add.group();
+    this._enemies = this.physics.add.group();
     for (const character of testMap.characters) {
       const position = tileToPixelPosition(
         character.position.x,
@@ -126,17 +127,55 @@ export class GameScene extends Phaser.Scene {
       );
       const newCharacter = new Enemy(this, position.x, position.y);
       newCharacter.setCollideWorldBounds(true);
-      enemies.add(newCharacter);
+      this._enemies.add(newCharacter);
     }
 
     return {
       player: this._player!,
-      enemies,
+      enemies: this._enemies!,
     };
   }
 
-  doGameOver() {
-    this.scene.stop();
-    this.scene.launch("game-over-scene");
+  addLives(amount: number) {
+    this._lives += amount;
+    this.events.emit("onChangeLives");
   }
+}
+
+function playerOverlapEnemy(
+  player: Character,
+  enemy: Character,
+  playerEnemyOverlap: Phaser.Physics.Arcade.Collider,
+  playerWorldCollider: Phaser.Physics.Arcade.Collider,
+  gameScene: GameScene
+) {
+  const playerY = player.getCenter().y!;
+  const enemyY = enemy.getCenter().y!;
+  const deltaY = enemyY - playerY;
+  if (deltaY >= tileSize / 2) {
+    (player as Player).forceJump();
+    gameScene.enemies?.remove(enemy);
+    enemy.die();
+  } else {
+    playerEnemyOverlap.destroy();
+
+    (player as Player).playerDeath(playerWorldCollider);
+    gameScene.addLives(-1);
+    const enemies = gameScene.enemies!;
+    for (const enemy of enemies.children.entries) {
+      (enemy as Enemy).setFrozen(true);
+    }
+    setTimeout(() => {
+      if (gameScene.lives === 0) {
+        doGameOver(gameScene);
+      } else {
+        gameScene.scene.restart();
+      }
+    }, 3000);
+  }
+}
+
+function doGameOver(gameScene: Phaser.Scene) {
+  gameScene.scene.stop();
+  gameScene.scene.launch("game-over-scene");
 }

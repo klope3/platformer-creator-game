@@ -5,7 +5,6 @@ import { textureKeys } from "./textureData";
 
 export class Player extends Character {
   private _cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
-  private _dead = false;
 
   constructor(
     scene: Phaser.Scene,
@@ -20,7 +19,8 @@ export class Player extends Character {
       textureKeys.player,
       playerMoveSpeed,
       animationKeys.playerMove,
-      animationKeys.playerIdle
+      animationKeys.playerIdle,
+      animationKeys.playerDie
     );
     this._cursors = cursorKeys;
     scene.add.existing(this);
@@ -28,9 +28,9 @@ export class Player extends Character {
   }
 
   jump() {
-    if (!this.body?.blocked.down && !this._dead) return;
+    if (!this.body?.blocked.down && !this.dead) return;
     this.setVelocityY(-1 * playerJumpForce);
-    const animationKey = this._dead
+    const animationKey = this.dead
       ? animationKeys.playerDie
       : animationKeys.playerJumping;
     this.anims.play(animationKey);
@@ -39,7 +39,7 @@ export class Player extends Character {
   protected preUpdate(time: number, delta: number) {
     super.preUpdate(time, delta);
 
-    if (this._dead) return;
+    if (this.dead) return;
 
     if (this._cursors?.left.isDown) {
       this.move("left");
@@ -53,9 +53,9 @@ export class Player extends Character {
     }
   }
 
-  die(worldCollider: Phaser.Physics.Arcade.Collider) {
-    this._dead = true;
+  playerDeath(worldCollider: Phaser.Physics.Arcade.Collider) {
     this.move("stop");
+    this.setDead(true);
     this.body!.enable = false;
     setTimeout(() => {
       this.body!.enable = true;

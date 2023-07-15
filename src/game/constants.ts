@@ -1,6 +1,7 @@
 export const playerJumpForce = 600,
   playerMoveSpeed = 170,
   enemyMoveSpeed = 100,
+  enemyDeathBounceForce = 300,
   gravity = 2200,
   gameWidth = 800,
   gameHeight = 600,

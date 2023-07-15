@@ -7,6 +7,7 @@ export const animationKeys = {
   playerDie: "playerDie",
   enemyMove: "enemyMove",
   enemyIdle: "enemyIdle",
+  enemyDie: "enemyDie",
 };
 
 export function initAnimations(scene: Phaser.Scene) {
@@ -46,6 +47,10 @@ export function initAnimations(scene: Phaser.Scene) {
       }),
       frameRate: 10,
       repeat: -1,
+    },
+    {
+      key: animationKeys.enemyDie,
+      frames: [{ key: textureKeys.enemy, frame: 6 }],
     },
   ];
   for (const anim of animations) {
