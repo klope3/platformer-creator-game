@@ -11,7 +11,7 @@ import {
   levelWidth,
   tileSize,
 } from "./constants";
-import { testMap } from "./testMap";
+import { testMap, testMap2, testMap3 } from "./testMap";
 import { textureData, textureKeys } from "./textureData";
 import { tileData } from "./tiles";
 import { Level, Vector2 } from "./types";
@@ -73,7 +73,7 @@ export class GameScene extends Phaser.Scene {
     initAnimations(this);
     this._cursors = this.input.keyboard?.createCursorKeys();
 
-    this._level = testMap;
+    this._level = testMap3;
     const buildMapResult = this.buildMap();
     if (!buildMapResult) return;
     const { solidLayer } = buildMapResult;
