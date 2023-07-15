@@ -4,6 +4,8 @@ import { Pickup } from "./Pickup";
 import { Player } from "./Player";
 import { initAnimations } from "./animations";
 import {
+  gameHeight,
+  gameWidth,
   killEnemyPointReward,
   levelHeight,
   levelWidth,
@@ -79,6 +81,20 @@ export class GameScene extends Phaser.Scene {
     const placeCharactersResult = this.placeCharacters();
     if (!placeCharactersResult) return;
     const { player, enemies } = placeCharactersResult;
+    this.cameras.main.setBounds(
+      0,
+      0,
+      tileSize * levelWidth * 2,
+      tileSize * levelHeight * 2
+    );
+    this.cameras.main.startFollow(
+      player,
+      true,
+      0.05,
+      0.05,
+      (-1 * gameWidth) / 4,
+      (-1 * gameHeight) / 4
+    );
     this.placePickups();
 
     const playerWorldCollider = this.physics.add.collider(player, solidLayer);

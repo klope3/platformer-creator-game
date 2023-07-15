@@ -120,6 +120,56 @@ export const testMap: Level = {
       position: { x: 20, y: 12 },
       type: "brick_green",
     },
+
+    {
+      position: { x: 21, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 22, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 23, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 24, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 25, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 26, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 27, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 28, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 29, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 30, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 31, y: 14 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 32, y: 14 },
+      type: "brick_green",
+    },
+
     {
       position: { x: 3, y: 8 },
       type: "brick_green",
