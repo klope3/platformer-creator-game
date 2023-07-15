@@ -7,4 +7,5 @@ export const playerJumpForce = 600,
   gameHeight = 600,
   tileSize = 16,
   levelWidth = 50,
-  levelHeight = 50;
+  levelHeight = 50,
+  killEnemyPointReward = 200;

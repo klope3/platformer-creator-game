@@ -6,6 +6,7 @@ export const textureKeys = {
   player: "tofuman",
   enemy: "enemy",
   tiles: "tiles",
+  pointPickup: "pointPickup",
 };
 
 export const textureData: TextureData[] = [
@@ -27,5 +28,12 @@ export const textureData: TextureData[] = [
     key: textureKeys.tiles,
     path: environmentPaths.tiles,
     type: "normal",
+  },
+  {
+    key: textureKeys.pointPickup,
+    path: environmentPaths.pointPickup,
+    type: "sheet",
+    frameWidth: tileSize,
+    frameHeight: tileSize,
   },
 ];

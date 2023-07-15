@@ -1,8 +1,14 @@
 import { Character } from "./Character";
 import { Enemy } from "./Enemy";
+import { Pickup } from "./Pickup";
 import { Player } from "./Player";
 import { initAnimations } from "./animations";
-import { levelHeight, levelWidth, tileSize } from "./constants";
+import {
+  killEnemyPointReward,
+  levelHeight,
+  levelWidth,
+  tileSize,
+} from "./constants";
 import { testMap } from "./testMap";
 import { textureData, textureKeys } from "./textureData";
 import { tileData } from "./tiles";
@@ -13,10 +19,16 @@ export class GameScene extends Phaser.Scene {
   private _cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   private _map?: Phaser.Tilemaps.Tilemap;
   private _enemies?: Phaser.Physics.Arcade.Group;
+  private _pickups?: Phaser.Physics.Arcade.Group;
   private _lives = 3;
+  private _points = 0;
 
   public get lives(): number {
     return this._lives;
+  }
+
+  public get points() {
+    return this._points;
   }
 
   public get enemies() {
@@ -49,9 +61,13 @@ export class GameScene extends Phaser.Scene {
     const { solidLayer } = buildMapResult;
 
     const { player, enemies } = this.placeCharacters();
+    this.placePickups();
 
     const playerWorldCollider = this.physics.add.collider(player, solidLayer);
     this.physics.add.collider(enemies, solidLayer);
+    this.physics.add.overlap(player, this._pickups!, (player, pickup) =>
+      playerOverlapPickup(player as Player, pickup as Pickup, this)
+    );
 
     const playerEnemyOverlapCollider = this.physics.add.overlap(
       player,
@@ -106,6 +122,19 @@ export class GameScene extends Phaser.Scene {
     };
   }
 
+  placePickups() {
+    this._pickups = this.physics.add.group();
+    for (const pickup of testMap.pickups) {
+      const pickupPosition = tileToPixelPosition(
+        pickup.position.x,
+        pickup.position.y
+      );
+      const newPickup = new Pickup(this, pickupPosition.x, pickupPosition.y);
+      this._pickups.add(newPickup);
+      (newPickup.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    }
+  }
+
   placeCharacters() {
     const playerPosition = tileToPixelPosition(
       testMap.playerPosition.x,
@@ -140,6 +169,12 @@ export class GameScene extends Phaser.Scene {
     this._lives += amount;
     this.events.emit("onChangeLives");
   }
+
+  addPoints(amount: number) {
+    this._points += amount;
+    if (this._points < 0) this._points = 0;
+    this.events.emit("onChangePoints");
+  }
 }
 
 function playerOverlapEnemy(
@@ -155,12 +190,16 @@ function playerOverlapEnemy(
   if (deltaY >= tileSize / 2) {
     (player as Player).forceJump();
     gameScene.enemies?.remove(enemy);
+    gameScene.addPoints(killEnemyPointReward);
     enemy.die();
   } else {
     playerEnemyOverlap.destroy();
 
     (player as Player).playerDeath(playerWorldCollider);
     gameScene.addLives(-1);
+
+    //? How many points, if any, should we lose for losing a life? If none, we might die on purpose just to farm enemies.
+
     const enemies = gameScene.enemies!;
     for (const enemy of enemies.children.entries) {
       (enemy as Enemy).setFrozen(true);
@@ -173,6 +212,15 @@ function playerOverlapEnemy(
       }
     }, 3000);
   }
+}
+
+function playerOverlapPickup(
+  player: Player,
+  pickup: Pickup,
+  gameScene: GameScene
+) {
+  gameScene.addPoints(100);
+  pickup.destroy();
 }
 
 function doGameOver(gameScene: Phaser.Scene) {

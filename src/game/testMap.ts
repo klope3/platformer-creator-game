@@ -1,7 +1,7 @@
 import { Level } from "./types";
 
 export const testMap: Level = {
-  playerPosition: { x: 4, y: 6 },
+  playerPosition: { x: 1, y: 6 },
   characters: [
     {
       type: "enemy",
@@ -118,6 +118,22 @@ export const testMap: Level = {
     {
       position: { x: 20, y: 12 },
       type: "brick_green",
+    },
+  ],
+  pickups: [
+    {
+      type: "normalPoints",
+      position: {
+        x: 3,
+        y: 7,
+      },
+    },
+    {
+      type: "normalPoints",
+      position: {
+        x: 4,
+        y: 7,
+      },
     },
   ],
 };

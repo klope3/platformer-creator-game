@@ -8,6 +8,7 @@ export const animationKeys = {
   enemyMove: "enemyMove",
   enemyIdle: "enemyIdle",
   enemyDie: "enemyDie",
+  pointPickupIdle: "pointPickupIdle",
 };
 
 export function initAnimations(scene: Phaser.Scene) {
@@ -51,6 +52,15 @@ export function initAnimations(scene: Phaser.Scene) {
     {
       key: animationKeys.enemyDie,
       frames: [{ key: textureKeys.enemy, frame: 6 }],
+    },
+    {
+      key: animationKeys.pointPickupIdle,
+      frames: anims.generateFrameNumbers(textureKeys.pointPickup, {
+        start: 4,
+        end: 7,
+      }),
+      frameRate: 4,
+      repeat: -1,
     },
   ];
   for (const anim of animations) {

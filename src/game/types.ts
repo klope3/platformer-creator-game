@@ -19,10 +19,16 @@ export type LevelTile = {
   type: TileType;
 };
 
+export type LevelPickup = {
+  type: PickupType;
+  position: Vector2;
+};
+
 export type Level = {
   playerPosition: Vector2;
   tiles: LevelTile[];
   characters: LevelCharacter[];
+  pickups: LevelPickup[];
 };
 
 export type Vector2 = {
@@ -49,3 +55,7 @@ export type TextureData = {
   frameWidth?: number;
   frameHeight?: number;
 };
+
+const pickupTypes = ["normalPoints"] as const;
+const pickupTypeSchema = z.enum(pickupTypes);
+export type PickupType = z.infer<typeof pickupTypeSchema>;

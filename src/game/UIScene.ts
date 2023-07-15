@@ -6,21 +6,38 @@ export class UIScene extends Phaser.Scene {
   }
 
   create() {
-    //  Grab a reference to the Game Scene
-    let ourGame = this.scene.get("game-scene") as GameScene;
-    console.log(ourGame);
-
-    //  Our Text object to display the Score
-    let info = this.add.text(10, 10, `Lives: ${ourGame.lives}`, {
+    const gameScene = this.scene.get("game-scene") as GameScene;
+    const textStyle = {
       font: "12px Arial",
       color: "#ffffff",
-    });
+    };
+
+    const livesText = this.add.text(
+      10,
+      10,
+      `Lives: ${gameScene.lives}`,
+      textStyle
+    );
+    const pointsText = this.add.text(
+      10,
+      25,
+      `Score: ${gameScene.points}`,
+      textStyle
+    );
 
     //  Listen for events from it
-    ourGame.events.on(
+    gameScene.events.on(
       "onChangeLives",
       () => {
-        info.setText("Lives: " + ourGame.lives);
+        livesText.setText("Lives: " + gameScene.lives);
+      },
+      this
+    );
+
+    gameScene.events.on(
+      "onChangePoints",
+      () => {
+        pointsText.setText(`Score: ${gameScene.points}`);
       },
       this
     );

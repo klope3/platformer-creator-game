@@ -8,4 +8,5 @@ export const characterPaths = {
 
 export const environmentPaths = {
   tiles: `${environmentDir}/tiles.png`,
+  pointPickup: `${environmentDir}/orb_blue.png`,
 };
