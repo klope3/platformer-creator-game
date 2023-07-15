@@ -2,19 +2,20 @@ import { Level } from "./types";
 
 export const testMap: Level = {
   playerPosition: { x: 1, y: 6 },
+  goalPosition: { x: 7, y: 1 },
   characters: [
     {
       type: "enemy",
       position: {
         x: 9,
-        y: 3,
+        y: 6,
       },
     },
     {
       type: "enemy",
       position: {
         x: 14,
-        y: 3,
+        y: 6,
       },
     },
   ],
@@ -117,6 +118,90 @@ export const testMap: Level = {
     },
     {
       position: { x: 20, y: 12 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 3, y: 8 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 4, y: 8 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 5, y: 8 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 6, y: 8 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 7, y: 8 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 5, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 6, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 7, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 8, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 9, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 10, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 11, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 12, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 13, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 14, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 15, y: 4 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 7, y: 2 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 8, y: 2 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 9, y: 2 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 10, y: 2 },
+      type: "brick_green",
+    },
+    {
+      position: { x: 11, y: 2 },
       type: "brick_green",
     },
   ],

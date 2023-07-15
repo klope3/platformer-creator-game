@@ -2,7 +2,12 @@ import { z } from "zod";
 
 export type MovementType = "left" | "right" | "stop";
 
-const tileTypes = ["brick_green", "block_green"] as const;
+const tileTypes = [
+  "brick_green",
+  "block_green",
+  "goal_bottom",
+  "goal_top",
+] as const;
 
 const tileTypeSchema = z.enum(tileTypes);
 
@@ -29,6 +34,7 @@ export type Level = {
   tiles: LevelTile[];
   characters: LevelCharacter[];
   pickups: LevelPickup[];
+  goalPosition: Vector2;
 };
 
 export type Vector2 = {

@@ -11,4 +11,14 @@ export const tileData: TileData[] = [
     tilesetIndex: 1,
     solid: true,
   },
+  {
+    type: "goal_bottom",
+    tilesetIndex: 2,
+    solid: false,
+  },
+  {
+    type: "goal_top",
+    tilesetIndex: 3,
+    solid: false,
+  },
 ];

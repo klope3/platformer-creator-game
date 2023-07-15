@@ -5,6 +5,7 @@ import { gameHeight, gameWidth, gravity } from "./game/constants";
 import { GameScene } from "./game/GameScene";
 import { UIScene } from "./game/UIScene";
 import { GameOverScene } from "./game/GameOverScene";
+import { VictoryScene } from "./game/VictoryScene";
 
 export function Game() {
   useEffect(() => {
@@ -22,7 +23,7 @@ export function Game() {
       },
       zoom: 2,
       pixelArt: true,
-      scene: [GameScene, UIScene, GameOverScene],
+      scene: [GameScene, UIScene, GameOverScene, VictoryScene],
     });
     return () => {
       game.destroy(true, false);

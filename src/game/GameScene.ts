@@ -12,16 +12,19 @@ import {
 import { testMap } from "./testMap";
 import { textureData, textureKeys } from "./textureData";
 import { tileData } from "./tiles";
+import { Level, Vector2 } from "./types";
 import { tileToPixelPosition } from "./utility";
 
 export class GameScene extends Phaser.Scene {
   private _player?: Player;
   private _cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
-  private _map?: Phaser.Tilemaps.Tilemap;
+  private _level?: Level;
+  private _tilemap?: Phaser.Tilemaps.Tilemap;
   private _enemies?: Phaser.Physics.Arcade.Group;
   private _pickups?: Phaser.Physics.Arcade.Group;
   private _lives = 3;
   private _points = 0;
+  private _victory = false;
 
   public get lives(): number {
     return this._lives;
@@ -31,8 +34,20 @@ export class GameScene extends Phaser.Scene {
     return this._points;
   }
 
+  public get victory() {
+    return this._victory;
+  }
+
   public get enemies() {
     return this._enemies;
+  }
+
+  public get goalPosition(): Vector2 {
+    const level = this._level;
+    return {
+      x: level ? level.goalPosition.x : -1,
+      y: level ? level.goalPosition.y : -1,
+    };
   }
 
   constructor() {
@@ -56,11 +71,14 @@ export class GameScene extends Phaser.Scene {
     initAnimations(this);
     this._cursors = this.input.keyboard?.createCursorKeys();
 
+    this._level = testMap;
     const buildMapResult = this.buildMap();
     if (!buildMapResult) return;
     const { solidLayer } = buildMapResult;
 
-    const { player, enemies } = this.placeCharacters();
+    const placeCharactersResult = this.placeCharacters();
+    if (!placeCharactersResult) return;
+    const { player, enemies } = placeCharactersResult;
     this.placePickups();
 
     const playerWorldCollider = this.physics.add.collider(player, solidLayer);
@@ -86,16 +104,19 @@ export class GameScene extends Phaser.Scene {
 
   buildMap() {
     //initialize
-    this._map = this.make.tilemap({
+    this._tilemap = this.make.tilemap({
       width: levelWidth,
       height: levelHeight,
       tileWidth: tileSize,
       tileHeight: tileSize,
     });
-    const tileset = this._map.addTilesetImage(textureKeys.tiles);
-    const layer = this._map.createBlankLayer("platforms", tileset!);
+    const tileset = this._tilemap.addTilesetImage(textureKeys.tiles);
+    const goalLayer = this._tilemap.createBlankLayer("goal", tileset!);
+    const solidLayer = this._tilemap.createBlankLayer("platforms", tileset!);
+    const level = this._level;
+    if (!level) return;
     //find matching data and place tiles
-    for (const tile of testMap.tiles) {
+    for (const tile of level.tiles) {
       const matchingTileData = tileData.find((data) => tile.type === data.type);
       if (matchingTileData === undefined) {
         console.error(
@@ -103,28 +124,51 @@ export class GameScene extends Phaser.Scene {
         );
         return;
       }
-      this._map.putTileAt(
+      this._tilemap.putTileAt(
         matchingTileData.tilesetIndex,
         tile.position.x,
         tile.position.y,
         true,
-        layer!
+        solidLayer!
       );
     }
+    const goalBottomData = tileData.find((data) => data.type === "goal_bottom");
+    const goalTopData = tileData.find((data) => data.type === "goal_top");
+    if (!goalBottomData || !goalTopData) {
+      console.error("Couldn't find data for goal tile(s)");
+      return;
+    }
+    this._tilemap.putTileAt(
+      goalBottomData.tilesetIndex,
+      level.goalPosition.x,
+      level.goalPosition.y,
+      true,
+      goalLayer!
+    );
+    this._tilemap.putTileAt(
+      goalTopData.tilesetIndex,
+      level.goalPosition.x,
+      level.goalPosition.y - 1,
+      true,
+      goalLayer!
+    );
     //set collision
     const collisionIndices = tileData
       .map((data) => (data.solid ? data.tilesetIndex : -1))
       .filter((item) => item !== -1);
-    this._map.setCollision(collisionIndices);
+    this._tilemap.setCollision(collisionIndices);
 
     return {
-      solidLayer: layer!,
+      solidLayer: solidLayer!,
     };
   }
 
   placePickups() {
+    const level = this._level;
+    if (!level) return;
+
     this._pickups = this.physics.add.group();
-    for (const pickup of testMap.pickups) {
+    for (const pickup of level.pickups) {
       const pickupPosition = tileToPixelPosition(
         pickup.position.x,
         pickup.position.y
@@ -136,9 +180,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   placeCharacters() {
+    const level = this._level;
+    if (!level) return;
+
     const playerPosition = tileToPixelPosition(
-      testMap.playerPosition.x,
-      testMap.playerPosition.y
+      level.playerPosition.x,
+      level.playerPosition.y
     );
     this._player = new Player(
       this,
@@ -149,7 +196,7 @@ export class GameScene extends Phaser.Scene {
     this._player.setCollideWorldBounds(true);
 
     this._enemies = this.physics.add.group();
-    for (const character of testMap.characters) {
+    for (const character of level.characters) {
       const position = tileToPixelPosition(
         character.position.x,
         character.position.y
@@ -174,6 +221,10 @@ export class GameScene extends Phaser.Scene {
     this._points += amount;
     if (this._points < 0) this._points = 0;
     this.events.emit("onChangePoints");
+  }
+
+  setVictory(value: boolean) {
+    this._victory = value;
   }
 }
 
@@ -226,4 +277,10 @@ function playerOverlapPickup(
 function doGameOver(gameScene: Phaser.Scene) {
   gameScene.scene.stop();
   gameScene.scene.launch("game-over-scene");
+}
+
+export function doGameWin(gameScene: GameScene) {
+  gameScene.setVictory(true);
+  gameScene.scene.launch("victory-scene");
+  gameScene.scene.pause();
 }
