@@ -18,7 +18,7 @@ export class UIScene extends Phaser.Scene {
 
     //  Listen for events from it
     ourGame.events.on(
-      "removeLife",
+      "loseLife",
       () => {
         info.setText("Lives: " + ourGame.lives);
       },

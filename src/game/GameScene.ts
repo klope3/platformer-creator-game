@@ -52,13 +52,17 @@ export class GameScene extends Phaser.Scene {
 
       player.die(playerWorldCollider);
       this._lives--;
-      this.events.emit("removeLife");
+      this.events.emit("loseLife");
       for (const enemy of enemies.children.entries) {
         if (!(enemy instanceof Enemy)) continue;
         enemy.setFrozen(true);
       }
       setTimeout(() => {
-        this.scene.restart();
+        if (this._lives === 0) {
+          this.doGameOver();
+        } else {
+          this.scene.restart();
+        }
       }, 3000);
     });
   }
@@ -129,5 +133,10 @@ export class GameScene extends Phaser.Scene {
       player: this._player!,
       enemies,
     };
+  }
+
+  doGameOver() {
+    this.scene.stop();
+    this.scene.launch("game-over-scene");
   }
 }

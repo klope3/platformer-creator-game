@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { gameHeight, gameWidth, gravity } from "./game/constants";
 import { GameScene } from "./game/GameScene";
 import { UIScene } from "./game/UIScene";
+import { GameOverScene } from "./game/GameOverScene";
 
 export function Game() {
   useEffect(() => {
@@ -21,7 +22,7 @@ export function Game() {
       },
       zoom: 2,
       pixelArt: true,
-      scene: [GameScene, UIScene],
+      scene: [GameScene, UIScene, GameOverScene],
     });
     return () => {
       game.destroy(true, false);
