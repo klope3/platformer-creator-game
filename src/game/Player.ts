@@ -1,5 +1,5 @@
 import { Character } from "./Character";
-import { GameScene, doGameWin } from "./GameScene";
+import { GameScene, doGameWin } from "./scenes/GameScene";
 import { animationKeys } from "./animations";
 import { playerJumpForce, playerMoveSpeed, tileSize } from "./constants";
 import { textureKeys } from "./textureData";

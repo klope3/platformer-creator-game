@@ -1,8 +1,8 @@
-import { Character } from "./Character";
-import { Enemy } from "./Enemy";
-import { Pickup } from "./Pickup";
-import { Player } from "./Player";
-import { initAnimations } from "./animations";
+import { Character } from "../Character";
+import { Enemy } from "../Enemy";
+import { Pickup } from "../Pickup";
+import { Player } from "../Player";
+import { initAnimations } from "../animations";
 import {
   gameHeight,
   gameWidth,
@@ -10,12 +10,12 @@ import {
   levelHeight,
   levelWidth,
   tileSize,
-} from "./constants";
-import { testMap, testMap2, testMap3 } from "./testMap";
-import { textureData, textureKeys } from "./textureData";
-import { tileData } from "./tiles";
-import { Level, Vector2 } from "./types";
-import { tileToPixelPosition } from "./utility";
+} from "../constants";
+import { testMap, testMap2, testMap3 } from "../testMap";
+import { textureData, textureKeys } from "../textureData";
+import { tileData } from "../tiles";
+import { Level, Vector2, fetchedLevelSchema } from "../types";
+import { convertFetchedLevel, tileToPixelPosition } from "../utility";
 
 export class GameScene extends Phaser.Scene {
   private _player?: Player;
@@ -56,6 +56,11 @@ export class GameScene extends Phaser.Scene {
     super("game-scene");
   }
 
+  init(data: any) {
+    const parsedLevel = fetchedLevelSchema.parse(data);
+    this._level = convertFetchedLevel(parsedLevel);
+  }
+
   preload() {
     for (const data of textureData) {
       if (data.type === "sheet") {
@@ -73,7 +78,7 @@ export class GameScene extends Phaser.Scene {
     initAnimations(this);
     this._cursors = this.input.keyboard?.createCursorKeys();
 
-    this._level = testMap3;
+    // this._level = testMap3;
     const buildMapResult = this.buildMap();
     if (!buildMapResult) return;
     const { solidLayer } = buildMapResult;
