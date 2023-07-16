@@ -257,14 +257,14 @@ export const testMap: Level = {
   ],
   pickups: [
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 3,
         y: 7,
       },
     },
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 4,
         y: 7,
@@ -499,42 +499,42 @@ export const testMap2: Level = {
   ],
   pickups: [
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 28,
         y: 25,
       },
     },
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 29,
         y: 25,
       },
     },
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 30,
         y: 25,
       },
     },
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 22,
         y: 25,
       },
     },
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 21,
         y: 25,
       },
     },
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 20,
         y: 25,
@@ -911,28 +911,28 @@ export const testMap3: Level = {
   },
   pickups: [
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 17,
         y: 4,
       },
     },
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 18,
         y: 4,
       },
     },
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 19,
         y: 4,
       },
     },
     {
-      type: "normalPoints",
+      type: "default",
       position: {
         x: 20,
         y: 4,

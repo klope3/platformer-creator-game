@@ -62,6 +62,6 @@ export type TextureData = {
   frameHeight?: number;
 };
 
-const pickupTypes = ["normalPoints"] as const;
+const pickupTypes = ["default"] as const;
 const pickupTypeSchema = z.enum(pickupTypes);
 export type PickupType = z.infer<typeof pickupTypeSchema>;
