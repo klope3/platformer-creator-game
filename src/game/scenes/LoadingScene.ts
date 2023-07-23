@@ -21,7 +21,6 @@ export class LoadingScene extends Phaser.Scene {
     fetch("http://localhost:3000/levels/5", requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         const parsedLevel = fetchedLevelSchema.parse(result);
         this.scene.start("game-scene", parsedLevel);
       })
