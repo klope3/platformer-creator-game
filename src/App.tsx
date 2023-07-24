@@ -4,11 +4,13 @@ import { Game } from "./Game";
 import { Link } from "react-router-dom";
 import { LogIn } from "./components/LogIn/LogIn";
 import { LevelBrowse } from "./components/LevelBrowse/LevelBrowse";
-import { AuthProvider } from "./components/AuthContext";
+import { AuthProvider } from "./components/AuthProvider";
+import { NavBar } from "./components/NavBar/NavBar";
 
 function App() {
   return (
     <AuthProvider>
+      <NavBar />
       <Routes>
         <Route
           path="/"

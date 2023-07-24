@@ -19,3 +19,10 @@ export function parseMessageJson(json: any) {
   });
   return schema.parse(json);
 }
+
+export function parseObjWithId(obj: any) {
+  const schema = z.object({
+    id: z.number(),
+  });
+  return schema.parse(obj);
+}

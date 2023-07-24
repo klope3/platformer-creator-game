@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getLoginResult } from "../../fetch";
-import { useAuth } from "../AuthContext";
+import { useAuth } from "../AuthProvider";
 
 export function LogIn() {
   const [error, setError] = useState(null as string | null);
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
 
   function clickLogIn(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -33,6 +33,11 @@ export function LogIn() {
       }
     });
   }
+
+  useEffect(() => {
+    if (user) navigate("/browse");
+  }, [user]);
+
   return (
     <>
       <form onSubmit={clickLogIn}>
