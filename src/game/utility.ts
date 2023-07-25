@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { tileSize } from "./constants";
 import {
   Level,
@@ -6,8 +5,8 @@ import {
   LevelPickup,
   LevelTile,
   Vector2,
-  fetchedLevelSchema,
 } from "./types";
+import { FetchedLevelData } from "../types";
 
 export function tileToPixelPosition(x: number, y: number): Vector2 {
   return {
@@ -16,9 +15,7 @@ export function tileToPixelPosition(x: number, y: number): Vector2 {
   };
 }
 
-export function convertFetchedLevel(
-  fetchedLevel: z.infer<typeof fetchedLevelSchema>
-): Level {
+export function convertFetchedLevel(fetchedLevel: FetchedLevelData): Level {
   const level: Level = {
     goalPosition: {
       x: fetchedLevel.goalPositionX,

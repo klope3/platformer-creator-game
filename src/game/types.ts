@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { dateParseableString } from "../validations";
 
 export type MovementType = "left" | "right" | "stop";
 
@@ -9,13 +8,13 @@ const tileTypes = [
   "goal_bottom",
   "goal_top",
 ] as const;
-const tileTypeSchema = z.enum(tileTypes);
+export const tileTypeSchema = z.enum(tileTypes);
 
 const characterTypes = ["player", "enemy"] as const;
-const characterTypeSchema = z.enum(characterTypes);
+export const characterTypeSchema = z.enum(characterTypes);
 
 const pickupTypes = ["default"] as const;
-const pickupTypeSchema = z.enum(pickupTypes);
+export const pickupTypeSchema = z.enum(pickupTypes);
 
 export type TileType = z.infer<typeof tileTypeSchema>;
 
@@ -34,39 +33,6 @@ export type LevelPickup = {
   type: PickupType;
   position: Vector2;
 };
-
-export const fetchedLevelSchema = z.object({
-  characters: z.array(
-    z.object({
-      positionX: z.number(),
-      positionY: z.number(),
-      type: characterTypeSchema,
-    })
-  ),
-  dateCreated: dateParseableString,
-  dateUpdated: dateParseableString,
-  description: z.string(),
-  goalPositionX: z.number(),
-  goalPositionY: z.number(),
-  pickups: z.array(
-    z.object({
-      positionX: z.number(),
-      positionY: z.number(),
-      type: pickupTypeSchema,
-    })
-  ),
-  playerPositionX: z.number(),
-  playerPositionY: z.number(),
-  private: z.boolean(),
-  tiles: z.array(
-    z.object({
-      positionX: z.number(),
-      positionY: z.number(),
-      type: tileTypeSchema,
-    })
-  ),
-  title: z.string(),
-});
 
 export type Level = {
   playerPosition: Vector2;

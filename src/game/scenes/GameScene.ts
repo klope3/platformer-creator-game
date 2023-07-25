@@ -1,3 +1,4 @@
+import { fetchedLevelDataSchema } from "../../types";
 import { Character } from "../Character";
 import { Enemy } from "../Enemy";
 import { Pickup } from "../Pickup";
@@ -14,7 +15,7 @@ import {
 import { testMap, testMap2, testMap3 } from "../testMap";
 import { textureData, textureKeys } from "../textureData";
 import { tileData } from "../tiles";
-import { Level, Vector2, fetchedLevelSchema } from "../types";
+import { Level, Vector2 } from "../types";
 import { convertFetchedLevel, tileToPixelPosition } from "../utility";
 
 export class GameScene extends Phaser.Scene {
@@ -57,7 +58,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   init(data: any) {
-    const parsedLevel = fetchedLevelSchema.parse(data);
+    const parsedLevel = fetchedLevelDataSchema.parse(data);
     this._level = convertFetchedLevel(parsedLevel);
   }
 

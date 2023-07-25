@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { fetchedLevelResultSchema } from "./types";
 
 export const dateParseableString = z
   .string()
@@ -25,4 +26,9 @@ export function parseObjWithId(obj: any) {
     id: z.number(),
   });
   return schema.parse(obj);
+}
+
+export function parseLevelSearchResultsJson(json: any) {
+  const schema = z.array(fetchedLevelResultSchema);
+  return schema.parse(json);
 }

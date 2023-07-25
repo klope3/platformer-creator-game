@@ -1,5 +1,5 @@
+import { fetchedLevelDataSchema } from "../../types";
 import { gameHeight, gameWidth } from "../constants";
-import { fetchedLevelSchema } from "../types";
 
 export class LoadingScene extends Phaser.Scene {
   constructor() {
@@ -18,10 +18,10 @@ export class LoadingScene extends Phaser.Scene {
       method: "GET",
     };
 
-    fetch("http://localhost:3000/levels/5", requestOptions)
+    fetch("http://localhost:3000/levels/1", requestOptions)
       .then((response) => response.json())
       .then((result) => {
-        const parsedLevel = fetchedLevelSchema.parse(result);
+        const parsedLevel = fetchedLevelDataSchema.parse(result);
         this.scene.start("game-scene", parsedLevel);
       })
       .catch((error) => console.log("error", error));
