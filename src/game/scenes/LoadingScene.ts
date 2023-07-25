@@ -1,7 +1,7 @@
-import { gameLevelId } from "../../Game";
-import { fetchedLevelDataSchema } from "../../types";
+// import { fetchedLevelDataSchema } from "../../types";
 import { gameHeight, gameWidth } from "../constants";
 
+//! This scene is currently unused.
 export class LoadingScene extends Phaser.Scene {
   constructor() {
     super("loading-scene");
@@ -14,39 +14,29 @@ export class LoadingScene extends Phaser.Scene {
       color: "#ffffff",
     });
     text.setOrigin(0.5, 0.5);
-
-    this.getFetchResult()
-      .then((result) => {
-        if (result.data) {
-          this.scene.start("game-scene", result.data);
-        } else {
-          text.setText("Error");
-        }
-      })
-      .catch((e) => console.error(e));
   }
 
   async getFetchResult() {
-    try {
-      const requestOptions = {
-        method: "GET",
-      };
-      const response = await fetch(
-        `http://localhost:3000/levels/${gameLevelId}`,
-        requestOptions
-      );
-      if (!response.ok) {
-        return {
-          data: undefined,
-        };
-      }
-      const json = await response.json();
-      return { data: fetchedLevelDataSchema.parse(json) };
-    } catch (error) {
-      console.error(error);
-      return {
-        data: undefined,
-      };
-    }
+    // try {
+    //   const requestOptions = {
+    //     method: "GET",
+    //   };
+    //   const response = await fetch(
+    //     `http://localhost:3000/levels/${gameLevelId}`,
+    //     requestOptions
+    //   );
+    //   if (!response.ok) {
+    //     return {
+    //       data: undefined,
+    //     };
+    //   }
+    //   const json = await response.json();
+    //   return { data: fetchedLevelDataSchema.parse(json) };
+    // } catch (error) {
+    //   console.error(error);
+    //   return {
+    //     data: undefined,
+    //   };
+    // }
   }
 }

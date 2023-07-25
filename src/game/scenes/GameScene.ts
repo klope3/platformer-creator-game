@@ -1,4 +1,4 @@
-import { fetchedLevelDataSchema } from "../../types";
+// import { fetchedLevelDataSchema } from "../../types";
 import { Character } from "../Character";
 import { Enemy } from "../Enemy";
 import { Pickup } from "../Pickup";
@@ -58,8 +58,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   init(data: any) {
-    const parsedLevel = fetchedLevelDataSchema.parse(data);
-    this._level = convertFetchedLevel(parsedLevel);
+    this._level = convertFetchedLevel(this.game.registry.get("fetchedLevel"));
   }
 
   preload() {
