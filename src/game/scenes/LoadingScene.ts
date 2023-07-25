@@ -1,3 +1,4 @@
+import { gameLevelId } from "../../Game";
 import { fetchedLevelDataSchema } from "../../types";
 import { gameHeight, gameWidth } from "../constants";
 
@@ -14,16 +15,38 @@ export class LoadingScene extends Phaser.Scene {
     });
     text.setOrigin(0.5, 0.5);
 
-    const requestOptions = {
-      method: "GET",
-    };
-
-    fetch("http://localhost:3000/levels/1", requestOptions)
-      .then((response) => response.json())
+    this.getFetchResult()
       .then((result) => {
-        const parsedLevel = fetchedLevelDataSchema.parse(result);
-        this.scene.start("game-scene", parsedLevel);
+        if (result.data) {
+          this.scene.start("game-scene", result.data);
+        } else {
+          text.setText("Error");
+        }
       })
-      .catch((error) => console.log("error", error));
+      .catch((e) => console.error(e));
+  }
+
+  async getFetchResult() {
+    try {
+      const requestOptions = {
+        method: "GET",
+      };
+      const response = await fetch(
+        `http://localhost:3000/levels/${gameLevelId}`,
+        requestOptions
+      );
+      if (!response.ok) {
+        return {
+          data: undefined,
+        };
+      }
+      const json = await response.json();
+      return { data: fetchedLevelDataSchema.parse(json) };
+    } catch (error) {
+      console.error(error);
+      return {
+        data: undefined,
+      };
+    }
   }
 }

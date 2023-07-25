@@ -16,13 +16,15 @@ function App() {
           path="/"
           element={
             <div>
-              <Link to="/game">Game</Link>
+              {/* <Link to="/game">Game</Link> */}
               <Link to="/login">Log In</Link>
             </div>
           }
         />
         <Route path="/login" element={<LogIn />} />
-        <Route path="/game" element={<Game />} />
+        <Route path="/game">
+          <Route path=":levelId" element={<Game />} />
+        </Route>
         <Route path="/browse" element={<LevelBrowse />} />
       </Routes>
     </AuthProvider>

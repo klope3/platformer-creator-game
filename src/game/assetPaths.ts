@@ -1,5 +1,5 @@
-const characterDir = "assets";
-const environmentDir = "assets";
+const characterDir = "/assets";
+const environmentDir = "/assets";
 
 export const characterPaths = {
   playerSheet: `${characterDir}/tofuman.png`,

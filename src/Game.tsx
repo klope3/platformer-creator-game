@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Phaser from "phaser";
 import { useEffect } from "react";
 import { gameHeight, gameWidth, gravity } from "./game/constants";
@@ -8,8 +8,15 @@ import { GameOverScene } from "./game/scenes/GameOverScene";
 import { VictoryScene } from "./game/scenes/VictoryScene";
 import { LoadingScene } from "./game/scenes/LoadingScene";
 
+export let gameLevelId = 0;
+
 export function Game() {
+  const { levelId } = useParams();
+
   useEffect(() => {
+    if (levelId && !isNaN(+levelId)) gameLevelId = +levelId;
+    else console.error("Invalid level id: " + levelId);
+
     const game = new Phaser.Game({
       type: Phaser.AUTO,
       parent: "game-container",
