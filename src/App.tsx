@@ -6,6 +6,7 @@ import { LogIn } from "./components/LogIn/LogIn";
 import { LevelBrowse } from "./components/LevelBrowse/LevelBrowse";
 import { AuthProvider } from "./components/AuthProvider";
 import { NavBar } from "./components/NavBar/NavBar";
+import { UserInfo } from "./components/UserInfo/UserInfo";
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function App() {
         <Route path="/login" element={<LogIn />} />
         <Route path="/game">
           <Route path=":levelId" element={<Game />} />
+        </Route>
+        <Route path="/user">
+          <Route path=":userId" element={<UserInfo />} />
         </Route>
         <Route path="/browse" element={<LevelBrowse />} />
       </Routes>
