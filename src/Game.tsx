@@ -19,7 +19,11 @@ export function Game() {
   );
 
   async function fetchAndStart() {
-    if (initializingStarted) return;
+    if (initializingStarted) {
+      //set the variable back to false so we can start initialization next time component mounts
+      initializingStarted = false;
+      return;
+    }
     initializingStarted = true;
     try {
       if (!levelId || isNaN(+levelId))
@@ -79,6 +83,12 @@ export function Game() {
       {fetchedLevel && (
         <div>
           {fetchedLevel.title}
+          <div>
+            Created by{" "}
+            <Link to={`/user/${fetchedLevel.userId}`}>
+              {fetchedLevel.user.username}
+            </Link>
+          </div>
           <div>
             Created on:{" "}
             {new Date(fetchedLevel.dateCreated).toLocaleDateString()}

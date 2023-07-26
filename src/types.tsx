@@ -7,6 +7,7 @@ import {
 } from "./game/types";
 
 export const userSchema = z.object({
+  id: z.number(),
   email: z.string(),
   username: z.string(),
 });
@@ -20,6 +21,9 @@ const fetchedLevelBaseSchema = z.object({
   dateCreated: dateParseableString,
   dateUpdated: dateParseableString,
   userId: z.number(),
+  user: z.object({
+    username: z.string(),
+  }),
 });
 
 //the schema for level data used to build levels in the game.
@@ -54,9 +58,6 @@ export const fetchedLevelDataSchema = fetchedLevelBaseSchema.extend({
 //the schema for level data that's fetched as part of a search.
 //does not include data for building the level (characters, tiles, etc.)
 export const fetchedLevelResultSchema = fetchedLevelBaseSchema.extend({
-  user: z.object({
-    username: z.string(),
-  }),
   averageRating: z.number(),
   totalRatings: z.number(),
   totalCompletions: z.number(),

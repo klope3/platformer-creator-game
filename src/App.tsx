@@ -13,15 +13,7 @@ function App() {
     <AuthProvider>
       <NavBar />
       <Routes>
-        <Route
-          path="/"
-          element={
-            <div>
-              {/* <Link to="/game">Game</Link> */}
-              <Link to="/login">Log In</Link>
-            </div>
-          }
-        />
+        <Route path="/" element={<div>This is the home page</div>} />
         <Route path="/login" element={<LogIn />} />
         <Route path="/game">
           <Route path=":levelId" element={<Game />} />

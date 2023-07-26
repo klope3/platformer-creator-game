@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { FetchedLevelResult } from "../../types";
 
 type LevelBrowseRowProps = {
@@ -6,6 +7,7 @@ type LevelBrowseRowProps = {
 
 export function LevelBrowseRow({
   fetchedLevel: {
+    id,
     dateCreated,
     dateUpdated,
     description,
@@ -19,13 +21,21 @@ export function LevelBrowseRow({
 }: LevelBrowseRowProps) {
   return (
     <div>
-      <h4>{title}</h4>
+      <h4>
+        <Link to={`/game/${id}`}>{title}</Link>
+      </h4>
       <div>{description}</div>
-      <div>Created by {user.username}</div>
+      <div>
+        Created by <Link to={`/user/${userId}`}>{user.username}</Link>
+      </div>
       <div>Published: {new Date(dateCreated).toLocaleDateString()}</div>
       <div>Updated: {new Date(dateUpdated).toLocaleDateString()}</div>
-      <div>Average Rating: {averageRating}/10</div>
-      <div>This level has been completed {totalCompletions} times.</div>
+      <div>
+        {totalRatings > 0
+          ? `Average rating: ${averageRating}/10`
+          : "No ratings yet"}
+      </div>
+      <div>Completed {totalCompletions} times</div>
     </div>
   );
 }

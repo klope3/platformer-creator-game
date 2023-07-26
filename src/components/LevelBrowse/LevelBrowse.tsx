@@ -38,7 +38,6 @@ export function LevelBrowse() {
 
   return (
     <div>
-      <div>Browsing</div>
       {isLoading && <div>Loading...</div>}
       {!isLoading &&
         searchResults.map((result) => <LevelBrowseRow fetchedLevel={result} />)}
