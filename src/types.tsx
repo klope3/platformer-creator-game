@@ -1,10 +1,14 @@
 import { z } from "zod";
-import { dateParseableString } from "./validations";
+// import { dateParseableString } from "./validations";
 import {
   characterTypeSchema,
   pickupTypeSchema,
   tileTypeSchema,
 } from "./game/types";
+
+export const dateParseableString = z
+  .string()
+  .refine((str) => !isNaN(new Date(str).getTime()));
 
 export const userSchema = z.object({
   id: z.number(),

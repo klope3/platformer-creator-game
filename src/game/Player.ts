@@ -67,6 +67,9 @@ export class Player extends Character {
       this.jump();
     }
     this._jumpButtonLastFrame = curJump;
+
+    const anyInput = cursors.left.isDown || cursors.right.isDown || jumpPressed;
+    if (anyInput) this._gameScene.setStartedPlaying(true);
   }
 
   checkWin() {

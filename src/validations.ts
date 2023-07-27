@@ -1,10 +1,6 @@
 import { z } from "zod";
 import { fetchedLevelResultSchema } from "./types";
 
-export const dateParseableString = z
-  .string()
-  .refine((str) => !isNaN(new Date(str).getTime()));
-
 export function parseAuthJson(json: any) {
   const schema = z.object({
     token: z.string(),

@@ -35,6 +35,7 @@ export type LevelPickup = {
 };
 
 export type Level = {
+  id: number;
   playerPosition: Vector2;
   tiles: LevelTile[];
   characters: LevelCharacter[];

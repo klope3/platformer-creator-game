@@ -1,4 +1,5 @@
 // import { fetchedLevelDataSchema } from "../../types";
+import jwtDecode from "jwt-decode";
 import { Character } from "../Character";
 import { Enemy } from "../Enemy";
 import { Pickup } from "../Pickup";
@@ -17,6 +18,7 @@ import { textureData, textureKeys } from "../textureData";
 import { tileData } from "../tiles";
 import { Level, Vector2 } from "../types";
 import { convertFetchedLevel, tileToPixelPosition } from "../utility";
+import { parseObjWithId, parseMessageJson } from "../../validations";
 
 export class GameScene extends Phaser.Scene {
   private _player?: Player;
@@ -28,6 +30,8 @@ export class GameScene extends Phaser.Scene {
   private _lives = 3;
   private _points = 0;
   private _victory = false;
+  private _timeMs = 0;
+  private _startedPlaying = false; //used to start the timer only after the first input.
 
   public get lives(): number {
     return this._lives;
@@ -51,6 +55,14 @@ export class GameScene extends Phaser.Scene {
       x: level ? level.goalPosition.x : -1,
       y: level ? level.goalPosition.y : -1,
     };
+  }
+
+  public get timeMs() {
+    return this._timeMs;
+  }
+
+  public get levelId() {
+    return this._level?.id;
   }
 
   constructor() {
@@ -77,6 +89,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     initAnimations(this);
     this._cursors = this.input.keyboard?.createCursorKeys();
+    this._timeMs = 0;
 
     // this._level = testMap3;
     const buildMapResult = this.buildMap();
@@ -121,6 +134,10 @@ export class GameScene extends Phaser.Scene {
         );
       }
     );
+  }
+
+  update(time: number, delta: number): void {
+    if (this._startedPlaying) this._timeMs += delta;
   }
 
   buildMap() {
@@ -244,8 +261,13 @@ export class GameScene extends Phaser.Scene {
     this.events.emit("onChangePoints");
   }
 
+  setStartedPlaying(value: boolean) {
+    this._startedPlaying = value;
+  }
+
   setVictory(value: boolean) {
     this._victory = value;
+    if (value) this._startedPlaying = false;
   }
 }
 
@@ -265,6 +287,7 @@ function playerOverlapEnemy(
     gameScene.addPoints(killEnemyPointReward);
     enemy.die();
   } else {
+    gameScene.setStartedPlaying(false);
     playerEnemyOverlap.destroy();
 
     (player as Player).playerDeath(playerWorldCollider);
@@ -304,4 +327,55 @@ export function doGameWin(gameScene: GameScene) {
   gameScene.setVictory(true);
   gameScene.scene.launch("victory-scene");
   gameScene.scene.pause();
+
+  const levelCompleteCb = gameScene.game.registry.get("levelCompleteCb");
+  if (levelCompleteCb) levelCompleteCb(gameScene.levelId, gameScene.timeMs);
+
+  window.dispatchEvent(new CustomEvent("onLevelComplete"));
+
+  // postLevelCompletion(gameScene);
+}
+
+async function postLevelCompletion(gameScene: GameScene) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("Couldn't post level completion, due to a missing token.");
+    return;
+  }
+  const level = gameScene.game.registry.get("fetchedLevel");
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Authorization", `Bearer ${token}`);
+
+  try {
+    const decoded = jwtDecode(token);
+    const parsed = parseObjWithId(decoded);
+
+    const raw = JSON.stringify({
+      userId: parsed.id,
+      levelId: level.id,
+      completionTime: gameScene.timeMs,
+    });
+
+    const redirect: RequestRedirect = "follow";
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect,
+    };
+
+    const response = await fetch(
+      "http://localhost:3000/levels/completions",
+      requestOptions
+    );
+    const json = await response.json();
+    if (!response.ok) {
+      const parsed = parseMessageJson(json);
+      throw new Error(parsed.message);
+    }
+  } catch (error) {
+    console.error("Failed to post level completion.", error);
+  }
 }

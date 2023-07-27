@@ -15,9 +15,14 @@ export function NavBar() {
           <Link to="/browse">Browse Games</Link>
         </li>
         {!user && (
-          <li>
-            <Link to="/login">Log In</Link>
-          </li>
+          <>
+            <li>
+              <Link to="/createAccount">Sign Up</Link>
+            </li>
+            <li>
+              <Link to="/login">Log In</Link>
+            </li>
+          </>
         )}
         {user && (
           <li>
