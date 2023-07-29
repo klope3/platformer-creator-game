@@ -1,5 +1,5 @@
 import { Character } from "./Character";
-import { GameScene, doGameWin } from "./scenes/GameScene";
+import { GameScene } from "./scenes/GameScene";
 import { animationKeys } from "./animations";
 import { playerJumpForce, playerMoveSpeed, tileSize } from "./constants";
 import { textureKeys } from "./textureData";
@@ -69,7 +69,7 @@ export class Player extends Character {
     this._jumpButtonLastFrame = curJump;
 
     const anyInput = cursors.left.isDown || cursors.right.isDown || jumpPressed;
-    if (anyInput) this._gameScene.setStartedPlaying(true);
+    if (anyInput) this._gameScene.setStartedPlaying(true); //allows the game timer to start only after first input
   }
 
   checkWin() {
@@ -77,7 +77,7 @@ export class Player extends Character {
     const tileY = Math.floor(this.y / tileSize);
     const goal = this._gameScene.goalPosition;
     if (tileX === goal.x && (tileY === goal.y - 1 || tileY === goal.y)) {
-      doGameWin(this._gameScene);
+      this._gameScene.doGameWin();
     }
   }
 

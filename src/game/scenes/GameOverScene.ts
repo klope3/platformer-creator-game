@@ -1,8 +1,8 @@
-import { gameHeight, gameWidth } from "../constants";
+import { gameHeight, gameWidth, sceneNames } from "../constants";
 
 export class GameOverScene extends Phaser.Scene {
   constructor() {
-    super("game-over-scene");
+    super(sceneNames.gameOverScene);
   }
 
   create() {

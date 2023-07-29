@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import { fetchLevelResults } from "../../fetch";
 import { FetchedLevelResult } from "../../types";
-import { parseLevelSearchResultsJson } from "../../validations";
 import { LevelBrowseRow } from "../LevelBrowseRow/LevelBrowseRow";
 
 export function LevelBrowse() {
@@ -10,21 +10,9 @@ export function LevelBrowse() {
   const [isLoading, setIsLoading] = useState(true);
 
   async function getResults() {
-    const requestOptions = {
-      method: "GET",
-    };
-
     try {
-      const response = await fetch(
-        "http://localhost:3000/levels",
-        requestOptions
-      );
-      if (!response.ok) {
-        return;
-      }
-      const json = await response.json();
-      const resultsParsed = parseLevelSearchResultsJson(json);
-      setSearchResults(resultsParsed);
+      const results = await fetchLevelResults();
+      if (results) setSearchResults(results);
       setIsLoading(false);
     } catch (error) {
       console.error(error);

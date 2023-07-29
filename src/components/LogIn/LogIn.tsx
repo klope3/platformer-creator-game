@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getLoginResult } from "../../fetch";
 import { useAuth } from "../AuthProvider";
-import { getDataFromAuthForm, getIdFromJwtToken } from "../../utility";
+import { submitAuthForm } from "../../utility";
 
 export function LogIn() {
   const [error, setError] = useState(null as string | null);
@@ -10,30 +9,7 @@ export function LogIn() {
   const { user, setUser } = useAuth();
 
   function clickLogIn(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const { email, password } = getDataFromAuthForm(
-      e.target as HTMLFormElement
-    );
-    if (typeof email !== "string" || typeof password !== "string") {
-      setError("Invalid credentials.");
-      return;
-    }
-
-    getLoginResult(email, password).then((result) => {
-      const { data, errorMessage } = result;
-      if (data && setUser) {
-        const id = getIdFromJwtToken(data.token);
-        setUser({
-          email: data.email,
-          username: data.username,
-          id,
-        });
-        localStorage.setItem("token", data.token);
-        navigate("/browse");
-      } else if (errorMessage) {
-        setError(errorMessage);
-      }
-    });
+    submitAuthForm(e, setError, navigate, setUser);
   }
 
   useEffect(() => {

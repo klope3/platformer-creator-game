@@ -1,24 +1,24 @@
 // import { fetchedLevelDataSchema } from "../../types";
-import jwtDecode from "jwt-decode";
+import { parseLevelCompletionCallback } from "../../validations";
 import { Character } from "../Character";
 import { Enemy } from "../Enemy";
 import { Pickup } from "../Pickup";
 import { Player } from "../Player";
 import { initAnimations } from "../animations";
 import {
+  eventNames,
   gameHeight,
   gameWidth,
-  killEnemyPointReward,
   levelHeight,
   levelWidth,
+  sceneNames,
   tileSize,
 } from "../constants";
-import { testMap, testMap2, testMap3 } from "../testMap";
+import { playerOverlapEnemy, playerOverlapPickup } from "../interactions";
 import { textureData, textureKeys } from "../textureData";
 import { tileData } from "../tiles";
 import { Level, Vector2 } from "../types";
 import { convertFetchedLevel, tileToPixelPosition } from "../utility";
-import { parseObjWithId, parseMessageJson } from "../../validations";
 
 export class GameScene extends Phaser.Scene {
   private _player?: Player;
@@ -66,32 +66,30 @@ export class GameScene extends Phaser.Scene {
   }
 
   constructor() {
-    super("game-scene");
-  }
-
-  init(data: any) {
-    this._level = convertFetchedLevel(this.game.registry.get("fetchedLevel"));
+    super(sceneNames.gameScene);
   }
 
   preload() {
     for (const data of textureData) {
-      if (data.type === "sheet") {
-        if (data.frameWidth === undefined || data.frameHeight === undefined)
-          console.error("Bad sprite sheet data!");
-        this.load.spritesheet(data.key, data.path, {
-          frameWidth: data.frameWidth!,
-          frameHeight: data.frameHeight,
-        });
-      } else this.load.image(data.key, data.path);
+      if (data.type !== "sheet") {
+        this.load.image(data.key, data.path);
+        continue;
+      }
+      if (data.frameWidth === undefined || data.frameHeight === undefined)
+        console.error("Bad sprite sheet data!");
+      this.load.spritesheet(data.key, data.path, {
+        frameWidth: data.frameWidth!,
+        frameHeight: data.frameHeight,
+      });
     }
   }
 
   create() {
     initAnimations(this);
     this._cursors = this.input.keyboard?.createCursorKeys();
-    this._timeMs = 0;
+    this._timeMs = 0; //reset the timer to 0 when the scene restarts due to lost life
+    this._level = convertFetchedLevel(this.game.registry.get("fetchedLevel"));
 
-    // this._level = testMap3;
     const buildMapResult = this.buildMap();
     if (!buildMapResult) return;
     const { solidLayer } = buildMapResult;
@@ -99,44 +97,12 @@ export class GameScene extends Phaser.Scene {
     const placeCharactersResult = this.placeCharacters();
     if (!placeCharactersResult) return;
     const { player, enemies } = placeCharactersResult;
-    this.cameras.main.setBounds(
-      0,
-      0,
-      tileSize * levelWidth * 2,
-      tileSize * levelHeight * 2
-    );
-    this.cameras.main.startFollow(
-      player,
-      true,
-      0.05,
-      0.05,
-      (-1 * gameWidth) / 4,
-      (-1 * gameHeight) / 4
-    );
+    this.setupCamera(player);
     this.placePickups();
-
-    const playerWorldCollider = this.physics.add.collider(player, solidLayer);
-    this.physics.add.collider(enemies, solidLayer);
-    this.physics.add.overlap(player, this._pickups!, (player, pickup) =>
-      playerOverlapPickup(player as Player, pickup as Pickup, this)
-    );
-
-    const playerEnemyOverlapCollider = this.physics.add.overlap(
-      player,
-      enemies,
-      (player, enemy) => {
-        playerOverlapEnemy(
-          player as Character,
-          enemy as Character,
-          playerEnemyOverlapCollider,
-          playerWorldCollider,
-          this
-        );
-      }
-    );
+    this.setupColliders(player, enemies, solidLayer);
   }
 
-  update(time: number, delta: number): void {
+  update(_: number, delta: number): void {
     if (this._startedPlaying) this._timeMs += delta;
   }
 
@@ -153,7 +119,7 @@ export class GameScene extends Phaser.Scene {
     const solidLayer = this._tilemap.createBlankLayer("platforms", tileset!);
     const level = this._level;
     if (!level) return;
-    //find matching data and place tiles
+    //find matching data and place all tiles in the map
     for (const tile of level.tiles) {
       const matchingTileData = tileData.find((data) => tile.type === data.type);
       if (matchingTileData === undefined) {
@@ -170,6 +136,7 @@ export class GameScene extends Phaser.Scene {
         solidLayer!
       );
     }
+    //place the goal, which is actually two tall (so a bottom and a top part)
     const goalBottomData = tileData.find((data) => data.type === "goal_bottom");
     const goalTopData = tileData.find((data) => data.type === "goal_top");
     if (!goalBottomData || !goalTopData) {
@@ -201,17 +168,32 @@ export class GameScene extends Phaser.Scene {
     };
   }
 
+  setupCamera(player: Player) {
+    this.cameras.main.setBounds(
+      0,
+      0,
+      tileSize * levelWidth * 2,
+      tileSize * levelHeight * 2
+    );
+    this.cameras.main.startFollow(
+      player,
+      true,
+      0.05,
+      0.05,
+      (-1 * gameWidth) / 4,
+      (-1 * gameHeight) / 4
+    );
+  }
+
   placePickups() {
     const level = this._level;
     if (!level) return;
 
     this._pickups = this.physics.add.group();
     for (const pickup of level.pickups) {
-      const pickupPosition = tileToPixelPosition(
-        pickup.position.x,
-        pickup.position.y
-      );
-      const newPickup = new Pickup(this, pickupPosition.x, pickupPosition.y);
+      const { x, y } = pickup.position;
+      const { x: pixelX, y: pixelY } = tileToPixelPosition(x, y);
+      const newPickup = new Pickup(this, pixelX, pixelY);
       this._pickups.add(newPickup);
       (newPickup.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
     }
@@ -221,25 +203,21 @@ export class GameScene extends Phaser.Scene {
     const level = this._level;
     if (!level) return;
 
-    const playerPosition = tileToPixelPosition(
-      level.playerPosition.x,
-      level.playerPosition.y
-    );
+    const { x: playerX, y: playerY } = level.playerPosition;
+    const playerPixelPosition = tileToPixelPosition(playerX, playerY);
     this._player = new Player(
       this,
-      playerPosition.x,
-      playerPosition.y,
+      playerPixelPosition.x,
+      playerPixelPosition.y,
       this._cursors!
     );
     this._player.setCollideWorldBounds(true);
 
     this._enemies = this.physics.add.group();
     for (const character of level.characters) {
-      const position = tileToPixelPosition(
-        character.position.x,
-        character.position.y
-      );
-      const newCharacter = new Enemy(this, position.x, position.y);
+      const { x, y } = character.position;
+      const { x: pixelX, y: pixelY } = tileToPixelPosition(x, y);
+      const newCharacter = new Enemy(this, pixelX, pixelY);
       newCharacter.setCollideWorldBounds(true);
       this._enemies.add(newCharacter);
     }
@@ -250,15 +228,41 @@ export class GameScene extends Phaser.Scene {
     };
   }
 
+  setupColliders(
+    player: Player,
+    enemies: Phaser.Physics.Arcade.Group,
+    solidLayer: Phaser.Tilemaps.TilemapLayer
+  ) {
+    const playerWorldCollider = this.physics.add.collider(player, solidLayer);
+    this.physics.add.collider(enemies, solidLayer);
+    this.physics.add.overlap(player, this._pickups!, (player, pickup) =>
+      playerOverlapPickup(player as Player, pickup as Pickup, this)
+    );
+
+    const playerEnemyOverlapCollider = this.physics.add.overlap(
+      player,
+      enemies,
+      (player, enemy) => {
+        playerOverlapEnemy(
+          player as Character,
+          enemy as Character,
+          playerEnemyOverlapCollider,
+          playerWorldCollider,
+          this
+        );
+      }
+    );
+  }
+
   addLives(amount: number) {
     this._lives += amount;
-    this.events.emit("onChangeLives");
+    this.events.emit(eventNames.onChangeLives);
   }
 
   addPoints(amount: number) {
     this._points += amount;
     if (this._points < 0) this._points = 0;
-    this.events.emit("onChangePoints");
+    this.events.emit(eventNames.onChangePoints);
   }
 
   setStartedPlaying(value: boolean) {
@@ -269,113 +273,26 @@ export class GameScene extends Phaser.Scene {
     this._victory = value;
     if (value) this._startedPlaying = false;
   }
-}
 
-function playerOverlapEnemy(
-  player: Character,
-  enemy: Character,
-  playerEnemyOverlap: Phaser.Physics.Arcade.Collider,
-  playerWorldCollider: Phaser.Physics.Arcade.Collider,
-  gameScene: GameScene
-) {
-  const playerY = player.getCenter().y!;
-  const enemyY = enemy.getCenter().y!;
-  const deltaY = enemyY - playerY;
-  if (deltaY >= tileSize / 2) {
-    (player as Player).forceJump();
-    gameScene.enemies?.remove(enemy);
-    gameScene.addPoints(killEnemyPointReward);
-    enemy.die();
-  } else {
-    gameScene.setStartedPlaying(false);
-    playerEnemyOverlap.destroy();
-
-    (player as Player).playerDeath(playerWorldCollider);
-    gameScene.addLives(-1);
-
-    //? How many points, if any, should we lose for losing a life? If none, we might die on purpose just to farm enemies.
-
-    const enemies = gameScene.enemies!;
-    for (const enemy of enemies.children.entries) {
-      (enemy as Enemy).setFrozen(true);
-    }
-    setTimeout(() => {
-      if (gameScene.lives === 0) {
-        doGameOver(gameScene);
-      } else {
-        gameScene.scene.restart();
-      }
-    }, 3000);
+  doGameOver() {
+    this.scene.stop();
+    this.scene.launch(sceneNames.gameOverScene);
   }
-}
 
-function playerOverlapPickup(
-  player: Player,
-  pickup: Pickup,
-  gameScene: GameScene
-) {
-  gameScene.addPoints(100);
-  pickup.destroy();
-}
+  doGameWin() {
+    this.setVictory(true);
+    this.scene.launch(sceneNames.victoryScene);
+    this.scene.pause();
 
-function doGameOver(gameScene: Phaser.Scene) {
-  gameScene.scene.stop();
-  gameScene.scene.launch("game-over-scene");
-}
-
-export function doGameWin(gameScene: GameScene) {
-  gameScene.setVictory(true);
-  gameScene.scene.launch("victory-scene");
-  gameScene.scene.pause();
-
-  const levelCompleteCb = gameScene.game.registry.get("levelCompleteCb");
-  if (levelCompleteCb) levelCompleteCb(gameScene.levelId, gameScene.timeMs);
-
-  window.dispatchEvent(new CustomEvent("onLevelComplete"));
-
-  // postLevelCompletion(gameScene);
-}
-
-async function postLevelCompletion(gameScene: GameScene) {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    console.error("Couldn't post level completion, due to a missing token.");
-    return;
-  }
-  const level = gameScene.game.registry.get("fetchedLevel");
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-  myHeaders.append("Authorization", `Bearer ${token}`);
-
-  try {
-    const decoded = jwtDecode(token);
-    const parsed = parseObjWithId(decoded);
-
-    const raw = JSON.stringify({
-      userId: parsed.id,
-      levelId: level.id,
-      completionTime: gameScene.timeMs,
-    });
-
-    const redirect: RequestRedirect = "follow";
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect,
-    };
-
-    const response = await fetch(
-      "http://localhost:3000/levels/completions",
-      requestOptions
-    );
-    const json = await response.json();
-    if (!response.ok) {
-      const parsed = parseMessageJson(json);
-      throw new Error(parsed.message);
+    try {
+      const levelCompleteCb = this.game.registry.get("levelCompleteCb");
+      const parsedCb = parseLevelCompletionCallback(levelCompleteCb);
+      const levelId = this.levelId!; //we could never have reached doGameWin if the level was undefined
+      parsedCb(levelId, this._timeMs);
+    } catch (error) {
+      console.error(
+        "There was something wrong with the level completion callback."
+      );
     }
-  } catch (error) {
-    console.error("Failed to post level completion.", error);
   }
 }

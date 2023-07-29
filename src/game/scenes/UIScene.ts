@@ -1,3 +1,4 @@
+import { eventNames, sceneNames } from "../constants";
 import { formatMilliseconds } from "../utility";
 import { GameScene } from "./GameScene";
 
@@ -6,11 +7,11 @@ export class UIScene extends Phaser.Scene {
   private _gameScene?: GameScene;
 
   constructor() {
-    super({ key: "UI", active: true });
+    super({ key: sceneNames.uiScene, active: true });
   }
 
   create() {
-    this._gameScene = this.scene.get("game-scene") as GameScene;
+    this._gameScene = this.scene.get(sceneNames.gameScene) as GameScene;
     const gameScene = this._gameScene;
     const textStyle = {
       font: "12px Arial",
@@ -32,9 +33,8 @@ export class UIScene extends Phaser.Scene {
     this._timerText = this.add.text(400, 10, `0:00:00`, textStyle);
     this._timerText.setOrigin(1, 0);
 
-    //  Listen for events from it
     gameScene.events.on(
-      "onChangeLives",
+      eventNames.onChangeLives,
       () => {
         livesText.setText("Lives: " + gameScene.lives);
       },
@@ -42,7 +42,7 @@ export class UIScene extends Phaser.Scene {
     );
 
     gameScene.events.on(
-      "onChangePoints",
+      eventNames.onChangePoints,
       () => {
         pointsText.setText(`Score: ${gameScene.points}`);
       },
@@ -50,7 +50,7 @@ export class UIScene extends Phaser.Scene {
     );
   }
 
-  update(time: number, delta: number): void {
+  update() {
     if (!this._gameScene) return;
     const ms = this._gameScene.timeMs;
     this._timerText?.setText(formatMilliseconds(ms));

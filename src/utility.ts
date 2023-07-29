@@ -1,6 +1,8 @@
 import jwtDecode from "jwt-decode";
 import { parseObjWithId } from "./validations";
-import { z } from "zod";
+import { getAuthResult } from "./fetch";
+import { NavigateFunction } from "react-router-dom";
+import { User } from "./types";
 
 export function getIdFromJwtToken(token: any) {
   const decoded = jwtDecode(token);
@@ -20,39 +22,51 @@ export function getDataFromAuthForm(form: HTMLFormElement) {
   };
 }
 
-// export function handleAuthFormData(
-//   form: HTMLFormElement,
-//   failureCb?: () => void
-// ) {
-//   const data = new FormData(form);
-//   const email = data.get("email");
-//   const password = data.get("password");
-//   if (!email || !password || typeof email !== "string" && typeof password !== "string") {
-//     return {
-//       email: null,
-//       password: null,
-//     };
-//   }
+export function serverUrl() {
+  const url = import.meta.env.VITE_SERVER_URL;
+  if (url === undefined) console.error("The server url was undefined!");
+  return url;
+}
 
-//   if (failureCb) failureCb();
-//   return {
-//     email: email as string,
-//     password: password as string,
-//   };
-// if (
-//   typeof email !== "string" ||
-//   typeof password !== "string" ||
-//   email.length === 0 ||
-//   password.length === 0
-// ) {
-//   if (failureCb) failureCb();
-//   return {
-//     email,
-//     password,
-//   };
-// }
-// return {
-//   email,
-//   password,
-// };
-// }
+export function submitAuthForm(
+  e: React.FormEvent<HTMLFormElement>,
+  errorMessageCb: (message: string) => void,
+  navigateCb: NavigateFunction,
+  setUserCb: ((user: User) => void) | null,
+  createAccount = false
+) {
+  e.preventDefault();
+  //get and validate form data
+  const { username, email, password } = getDataFromAuthForm(
+    e.target as HTMLFormElement
+  );
+  if (
+    (createAccount && typeof username !== "string") ||
+    typeof email !== "string" ||
+    typeof password !== "string"
+  ) {
+    errorMessageCb("Please fill out required fields.");
+    return;
+  }
+
+  const usernameArg =
+    createAccount && typeof username === "string" ? username : "";
+
+  //use the data to actually fetch
+  const endpoint = createAccount ? "users" : "login";
+  getAuthResult(email, password, usernameArg, endpoint).then((result) => {
+    const { data, errorMessage } = result;
+    if (data && setUserCb) {
+      const id = getIdFromJwtToken(data.token);
+      setUserCb({
+        id,
+        username: data.username,
+        email: data.email,
+      });
+      localStorage.setItem("token", data.token);
+      navigateCb("/browse");
+    } else if (errorMessage) {
+      errorMessageCb(errorMessage);
+    }
+  });
+}

@@ -28,3 +28,8 @@ export function parseLevelSearchResultsJson(json: any) {
   const schema = z.array(fetchedLevelResultSchema);
   return schema.parse(json);
 }
+
+export function parseLevelCompletionCallback(cb: any) {
+  const schema = z.function().args(z.number(), z.number());
+  return schema.parse(cb);
+}

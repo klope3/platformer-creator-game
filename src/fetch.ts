@@ -1,4 +1,11 @@
-import { parseAuthJson, parseMessageJson } from "./validations";
+import jwtDecode from "jwt-decode";
+import { fetchedLevelDataSchema, userSchema } from "./types";
+import { serverUrl } from "./utility";
+import {
+  parseAuthJson,
+  parseLevelSearchResultsJson,
+  parseObjWithId,
+} from "./validations";
 
 type AuthFetchResult = {
   data?: {
@@ -11,52 +18,41 @@ type AuthFetchResult = {
 
 const unknownError = "Something went wrong. Try again later.";
 
-export async function getLoginResult(
+export async function getAuthResult(
   email: string,
-  password: string
+  password: string,
+  username: string,
+  endpoint: "login" | "users"
 ): Promise<AuthFetchResult> {
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
 
   const raw = JSON.stringify({
     email,
     password,
+    username,
   });
 
   const requestOptions = {
     method: "POST",
-    headers: myHeaders,
+    headers: headers,
     body: raw,
   };
 
   try {
-    const response = await fetch("http://localhost:3000/login", requestOptions);
-
+    const response = await fetch(`${serverUrl()}/${endpoint}`, requestOptions);
     const json = await response.json();
 
     if (!response.ok) {
-      try {
-        const parsed = parseMessageJson(json);
-        return {
-          errorMessage: parsed.message,
-        };
-      } catch (error) {
-        return {
-          errorMessage: unknownError,
-        };
-      }
+      return {
+        errorMessage: json.message || unknownError,
+      };
     }
 
-    try {
-      const parsed = parseAuthJson(json);
-      return {
-        data: parsed,
-      };
-    } catch (error) {
-      return {
-        errorMessage: unknownError,
-      };
-    }
+    const parsed = parseAuthJson(json);
+    return {
+      data: parsed,
+    };
   } catch (error) {
     return {
       errorMessage: unknownError,
@@ -64,57 +60,85 @@ export async function getLoginResult(
   }
 }
 
-//TODO: Could login and create account functions be merged in any way?
-export async function getCreateAccountResult(
-  username: string,
-  email: string,
-  password: string
-): Promise<AuthFetchResult> {
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
+export async function fetchUser(userId: number) {
+  const requestOptions = {
+    method: "GET",
+  };
+  const response = await fetch(
+    `${serverUrl()}/users/${userId}`,
+    requestOptions
+  );
+  const json = await response.json();
+  return userSchema.parse(json);
+}
+
+export async function fetchLevel(levelId: number) {
+  const requestOptions = {
+    method: "GET",
+  };
+  const response = await fetch(
+    `${serverUrl()}/levels/${+levelId}`,
+    requestOptions
+  );
+
+  const json = await response.json();
+  return fetchedLevelDataSchema.parse(json);
+}
+
+export async function fetchLevelResults() {
+  const requestOptions = {
+    method: "GET",
+  };
+
+  const response = await fetch(`${serverUrl()}/levels`, requestOptions);
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+  const json = await response.json();
+  return parseLevelSearchResultsJson(json);
+}
+
+export async function postLevelCompletion(levelId: number, timeMs: number) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("Couldn't post level completion, due to a missing token.");
+    return;
+  }
+
+  const headers = new Headers();
+  headers.append("Content-Type", "application/json");
+  headers.append("Authorization", `Bearer ${token}`);
+
+  const decoded = jwtDecode(token);
+  const parsed = parseObjWithId(decoded);
 
   const raw = JSON.stringify({
-    username,
-    email,
-    password,
+    userId: parsed.id,
+    levelId: levelId,
+    completionTime: Math.round(timeMs),
   });
+
+  const redirect: RequestRedirect = "follow";
 
   const requestOptions = {
     method: "POST",
-    headers: myHeaders,
+    headers: headers,
     body: raw,
+    redirect,
   };
-  try {
-    const response = await fetch("http://localhost:3000/users", requestOptions);
 
-    const json = await response.json();
+  const response = await fetch(
+    `${serverUrl()}/levels/completions`,
+    requestOptions
+  );
+  const json = await response.json();
 
-    if (!response.ok) {
-      try {
-        const parsed = parseMessageJson(json);
-        return {
-          errorMessage: parsed.message,
-        };
-      } catch (error) {
-        return {
-          errorMessage: unknownError,
-        };
-      }
+  if (!response.ok) {
+    if (json.message) throw new Error(json.message);
+    else {
+      throw new Error(json);
     }
-
-    try {
-      const parsed = parseAuthJson(json);
-      return {
-        data: parsed,
-      };
-    } catch (error) {
-      return {
-        errorMessage: unknownError,
-      };
-    }
-  } catch (error) {
-    return {
-      errorMessage: unknownError,
-    };
   }
+
+  return json;
 }

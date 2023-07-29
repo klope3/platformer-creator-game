@@ -5,9 +5,10 @@ import {
   ReactNode,
   useEffect,
 } from "react";
-import { User, userSchema } from "../types";
+import { User } from "../types";
 import jwtDecode from "jwt-decode";
 import { parseObjWithId } from "../validations";
+import { fetchUser } from "../fetch";
 
 type AuthContextType = {
   user: User | null;
@@ -29,36 +30,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState(null as User | null);
   const [isPending, setIsPending] = useState(true);
 
-  //TODO: This needs a better name!
-  async function doAuth() {
+  async function tryAutoLogin() {
     const storedToken = localStorage.getItem("token");
     if (!storedToken) {
       setIsPending(false);
-    } else {
-      const decoded = jwtDecode(storedToken);
-      try {
-        const parsed = parseObjWithId(decoded);
+      return;
+    }
 
-        const requestOptions = {
-          method: "GET",
-        };
-        const response = await fetch(
-          `http://localhost:3000/users/${parsed.id}`,
-          requestOptions
-        );
-        const json = await response.json();
-        const parseduser = userSchema.parse(json);
+    const decoded = jwtDecode(storedToken);
+    try {
+      const parsed = parseObjWithId(decoded);
 
-        setIsPending(false);
-        setUser(parseduser);
-      } catch (error) {
-        console.error(error);
-      }
+      //? Might want to validate token first?
+      const user = await fetchUser(parsed.id);
+
+      setIsPending(false);
+      setUser(user);
+    } catch (error) {
+      console.error(error);
     }
   }
 
   useEffect(() => {
-    doAuth();
+    tryAutoLogin();
   }, []);
 
   return (

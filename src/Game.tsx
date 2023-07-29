@@ -6,12 +6,10 @@ import { GameScene } from "./game/scenes/GameScene";
 import { UIScene } from "./game/scenes/UIScene";
 import { GameOverScene } from "./game/scenes/GameOverScene";
 import { VictoryScene } from "./game/scenes/VictoryScene";
-import { FetchedLevelData, fetchedLevelDataSchema } from "./types";
-import jwtDecode from "jwt-decode";
-import { parseMessageJson, parseObjWithId } from "./validations";
+import { FetchedLevelData } from "./types";
+import { fetchLevel, postLevelCompletion } from "./fetch";
 
-//the async fetchAndStart is called when Game first mounts, but React will always remount it a second time.
-//this variable stops another fetch from starting if one has already started.
+//? Some unusual techniques are used to allow Phaser and React to share data. See bottom component for info.
 let initializingStarted = false;
 
 export function Game() {
@@ -19,6 +17,7 @@ export function Game() {
   const [fetchedLevel, setFetchedLevel] = useState(
     null as FetchedLevelData | null
   );
+  //TODO: Keep an array of completions in state to show the user their previous completions of this level
 
   async function fetchAndStart() {
     if (initializingStarted) {
@@ -31,19 +30,10 @@ export function Game() {
       if (!levelId || isNaN(+levelId))
         throw new Error("Invalid level id " + levelId);
 
-      const requestOptions = {
-        method: "GET",
-      };
-      const response = await fetch(
-        `http://localhost:3000/levels/${+levelId}`,
-        requestOptions
-      );
+      const level = await fetchLevel(+levelId);
+      setFetchedLevel(level);
 
-      const json = await response.json();
-      const parsedData = fetchedLevelDataSchema.parse(json);
-      setFetchedLevel(parsedData);
-
-      const game = new Phaser.Game({
+      new Phaser.Game({
         type: Phaser.AUTO,
         parent: "game-container",
         width: gameWidth,
@@ -61,7 +51,7 @@ export function Game() {
         callbacks: {
           preBoot: (game: Phaser.Game) => {
             game.registry.merge({
-              fetchedLevel: parsedData,
+              fetchedLevel: level,
               levelCompleteCb: handleLevelCompletion,
             });
           },
@@ -73,64 +63,18 @@ export function Game() {
   }
 
   async function handleLevelCompletion(levelId: number, timeMs: number) {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("Couldn't post level completion, due to a missing token.");
-      return;
-    }
-
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", `Bearer ${token}`);
-
     try {
-      const decoded = jwtDecode(token);
-      const parsed = parseObjWithId(decoded);
-
-      const raw = JSON.stringify({
-        userId: parsed.id,
-        levelId: levelId,
-        completionTime: Math.round(timeMs),
-      });
-      console.log("level is", fetchedLevel);
-
-      const redirect: RequestRedirect = "follow";
-
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect,
-      };
-
-      const response = await fetch(
-        "http://localhost:3000/levels/completions",
-        requestOptions
-      );
-      const json = await response.json();
-      if (!response.ok) {
-        if (json.message) throw new Error(json.message);
-        else {
-          console.log(json);
-          throw new Error(json);
-        }
-      }
+      //TODO: should store the new completion in state with the others
+      postLevelCompletion(levelId, timeMs);
     } catch (error) {
-      // console.error("Failed to post level completion.", error);
       console.error(error);
     }
   }
 
   useEffect(() => {
     fetchAndStart();
-    // window.addEventListener("onLevelComplete", handleLevelCompletion);
-
-    // return () => {
-    //   window.removeEventListener("onLevelComplete", handleLevelCompletion);
-    // };
   }, []);
 
-  //TODO: the user should be able to go to site.com/play/:levelId to play a specific level id. React Router useParams with nested routes might be the way to go here. https://reactrouter.com/en/main/hooks/use-params
   return (
     <>
       <Link to="/">Home</Link>
@@ -159,3 +103,20 @@ export function Game() {
     </>
   );
 }
+
+/*
+---Starting the game
+The Phaser game instance lives inside the "Game" React component. It's created when the component first mounts. But React always mounts components twice, so we need to stop the game from initializing twice. To further complicate matters, a fetch call getting level data from the DB must be resolved before the game is initialized; this data needs to be used both in the React UI and in the game itself; and when the player wins (which the game itself must report), we need to use this data in another fetch call to post data about the level completion.
+
+Here's what happens when the game starts:
+1) Game component mounts
+2) useEffect is called, which in turn calls fetchAndStart
+3) fetchAndStart initiates the fetch call and sets initializingStarted to true
+4) React unmounts and remounts the component
+5) useEffect calls fetchAndStart again, which exits immediately because intializingStarted is true. This prevents a second async fetchAndStart from executing alongside the first one.
+6) The first fetchAndStart resolves, and the response is parsed.
+7) Assuming no errors, the game is initialized. To allow the game to build the level from the fetched data, we use the game's preboot callback to add the data to the game registry. We also add a callback to the registry, to be called when the level is completed.
+8) The player can start playing.
+
+This complicated sequence is not ideal, and in fact, it breaks the React rule of keeping components pure (by relying on and changing the external initializingStarted variable). But the learning resources available for using Phaser and React together are very limited, and adding data fetching into the mix makes the use case even more niche. This is simply the solution I was able to come up with in the absence of better/best practices relevant to the situation.
+ */
