@@ -1,4 +1,4 @@
-import { characterPaths, environmentPaths } from "./assetPaths";
+import { characterPaths, environmentPaths } from "../assetPaths";
 import { tileSize } from "./constants";
 import { TextureData } from "./types";
 
