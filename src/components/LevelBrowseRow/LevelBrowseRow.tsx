@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FetchedLevelResult } from "../../types";
+import { FetchedLevelResult } from "../../../platformer-creator-game-shared/types";
 
 type LevelBrowseRowProps = {
   fetchedLevel: FetchedLevelResult;

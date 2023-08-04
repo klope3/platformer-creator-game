@@ -1,4 +1,4 @@
-import { TileData } from "./types";
+import { TileData } from "../../platformer-creator-game-shared/types";
 
 export const tileData: TileData[] = [
   {

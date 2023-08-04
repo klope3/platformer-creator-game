@@ -2,7 +2,7 @@ import jwtDecode from "jwt-decode";
 import { parseObjWithId } from "./validations";
 import { getAuthResult } from "./fetch";
 import { NavigateFunction } from "react-router-dom";
-import { User } from "./types";
+import { User } from "../platformer-creator-game-shared/types";
 
 export function getIdFromJwtToken(token: any) {
   const decoded = jwtDecode(token);

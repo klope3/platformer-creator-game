@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { fetchedLevelResultSchema } from "./types";
+import { fetchedLevelResultSchema } from "../platformer-creator-game-shared/types";
 
 export function parseAuthJson(json: any) {
   const schema = z.object({

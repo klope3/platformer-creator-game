@@ -5,7 +5,7 @@ import {
   ReactNode,
   useEffect,
 } from "react";
-import { User } from "../types";
+import { User } from "../../platformer-creator-game-shared/types";
 import jwtDecode from "jwt-decode";
 import { parseObjWithId } from "../validations";
 import { fetchUser } from "../fetch";

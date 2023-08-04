@@ -5,8 +5,9 @@ import {
   LevelPickup,
   LevelTile,
   Vector2,
-} from "./types";
-import { FetchedLevelData } from "../types";
+  FetchedLevelData,
+} from "../../platformer-creator-game-shared/types";
+// import { FetchedLevelData } from "../";
 
 export function tileToPixelPosition(x: number, y: number): Vector2 {
   return {

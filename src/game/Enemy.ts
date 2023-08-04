@@ -2,7 +2,7 @@ import { Character } from "./Character";
 import { animationKeys } from "./animations";
 import { enemyMoveSpeed } from "./constants";
 import { textureKeys } from "./textureData";
-import { MovementType } from "./types";
+import { MovementType } from "../../platformer-creator-game-shared/types";
 
 export class Enemy extends Character {
   private _timer = 0;
