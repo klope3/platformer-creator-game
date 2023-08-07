@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchUser as fetchDbUser } from "../../fetch";
-import { User } from "../../../platformer-creator-game-shared/types";
+import { User } from "../../../platformer-creator-game-shared/typesFetched";
 import { useAuth } from "../AuthProvider";
 
 export function UserInfo() {

@@ -1,5 +1,5 @@
 import { textureKeys } from "./textureData";
-import { CharacterData } from "../../platformer-creator-game-shared/types";
+import { CharacterData } from "../../platformer-creator-game-shared/typesGame";
 
 export const characterData: CharacterData[] = [
   {

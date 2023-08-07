@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchLevelResults } from "../../fetch";
-import { FetchedLevelResult } from "../../../platformer-creator-game-shared/types";
+import { FetchedLevelResult } from "../../../platformer-creator-game-shared/typesFetched";
 import { LevelBrowseRow } from "../LevelBrowseRow/LevelBrowseRow";
 
 export function LevelBrowse() {

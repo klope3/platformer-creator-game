@@ -2,7 +2,7 @@ import jwtDecode from "jwt-decode";
 import {
   fetchedLevelDataSchema,
   userSchema,
-} from "../platformer-creator-game-shared/types";
+} from "../platformer-creator-game-shared/typesFetched";
 import { serverUrl } from "./utility";
 import {
   parseAuthJson,

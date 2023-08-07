@@ -1,5 +1,5 @@
 import { enemyDeathBounceForce, playerJumpForce, tileSize } from "./constants";
-import { MovementType } from "../../platformer-creator-game-shared/types";
+import { MovementType } from "../../platformer-creator-game-shared/typesGame";
 
 export class Character extends Phaser.Physics.Arcade.Sprite {
   protected _facingLeft = false;

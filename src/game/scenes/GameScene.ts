@@ -17,7 +17,10 @@ import {
 import { playerOverlapEnemy, playerOverlapPickup } from "../interactions";
 import { textureData, textureKeys } from "../textureData";
 import { tileData } from "../tiles";
-import { Level, Vector2 } from "../../../platformer-creator-game-shared/types";
+import {
+  Level,
+  Vector2,
+} from "../../../platformer-creator-game-shared/typesGame";
 import { convertFetchedLevel, tileToPixelPosition } from "../utility";
 
 export class GameScene extends Phaser.Scene {

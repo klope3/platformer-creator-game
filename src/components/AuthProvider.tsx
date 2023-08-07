@@ -5,14 +5,16 @@ import {
   ReactNode,
   useEffect,
 } from "react";
-import { User } from "../../platformer-creator-game-shared/types";
+import { User } from "../../platformer-creator-game-shared/typesFetched";
 import jwtDecode from "jwt-decode";
 import { parseObjWithId } from "../validations";
 import { fetchUser } from "../fetch";
 
+export type UserAuthData = Omit<User, "joinDate">;
+
 type AuthContextType = {
-  user: User | null;
-  setUser: (user: User | null) => void;
+  user: UserAuthData | null;
+  setUser: (user: UserAuthData | null) => void;
   isPending: boolean;
 };
 
@@ -27,7 +29,7 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState(null as User | null);
+  const [user, setUser] = useState(null as UserAuthData | null);
   const [isPending, setIsPending] = useState(true);
 
   async function tryAutoLogin() {

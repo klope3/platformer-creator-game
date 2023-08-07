@@ -2,7 +2,8 @@ import jwtDecode from "jwt-decode";
 import { parseObjWithId } from "./validations";
 import { getAuthResult } from "./fetch";
 import { NavigateFunction } from "react-router-dom";
-import { User } from "../platformer-creator-game-shared/types";
+import { User } from "../platformer-creator-game-shared/typesFetched";
+import { UserAuthData } from "./components/AuthProvider";
 
 export function getIdFromJwtToken(token: any) {
   const decoded = jwtDecode(token);
@@ -32,7 +33,7 @@ export function submitAuthForm(
   e: React.FormEvent<HTMLFormElement>,
   errorMessageCb: (message: string) => void,
   navigateCb: NavigateFunction,
-  setUserCb: ((user: User) => void) | null,
+  setUserCb: ((user: UserAuthData) => void) | null,
   createAccount = false
 ) {
   e.preventDefault();

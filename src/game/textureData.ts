@@ -1,6 +1,6 @@
 import { characterPaths, environmentPaths } from "../assetPaths";
 import { tileSize } from "./constants";
-import { TextureData } from "../../platformer-creator-game-shared/types";
+import { TextureData } from "../../platformer-creator-game-shared/typesGame";
 
 export const textureKeys = {
   player: "tofuman",

@@ -1,12 +1,12 @@
 import { tileSize } from "./constants";
+import { FetchedLevelData } from "../../platformer-creator-game-shared/typesFetched";
 import {
-  Level,
   LevelCharacter,
   LevelPickup,
   LevelTile,
   Vector2,
-  FetchedLevelData,
-} from "../../platformer-creator-game-shared/types";
+  Level,
+} from "../../platformer-creator-game-shared/typesGame";
 // import { FetchedLevelData } from "../";
 
 export function tileToPixelPosition(x: number, y: number): Vector2 {

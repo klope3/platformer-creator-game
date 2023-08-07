@@ -6,7 +6,7 @@ import { GameScene } from "./game/scenes/GameScene";
 import { UIScene } from "./game/scenes/UIScene";
 import { GameOverScene } from "./game/scenes/GameOverScene";
 import { VictoryScene } from "./game/scenes/VictoryScene";
-import { FetchedLevelData } from "../platformer-creator-game-shared/types";
+import { FetchedLevelData } from "../platformer-creator-game-shared/typesFetched";
 import { fetchLevel, postLevelCompletion } from "./fetch";
 
 //? Some unusual techniques are used to allow Phaser and React to share data. See bottom component for info.
