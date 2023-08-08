@@ -1,6 +1,7 @@
 import jwtDecode from "jwt-decode";
 import {
   fetchedLevelDataSchema,
+  ratingSchema,
   userSchema,
 } from "../platformer-creator-game-shared/typesFetched";
 import { serverUrl } from "./utility";
@@ -20,6 +21,14 @@ type AuthFetchResult = {
 };
 
 const unknownError = "Something went wrong. Try again later.";
+
+function createAuthHeaders(token: string, includeHeaderForPosting = false) {
+  const headers = new Headers();
+  headers.append("Authorization", `Bearer ${token}`);
+  if (includeHeaderForPosting)
+    headers.append("Content-Type", "application/json");
+  return headers;
+}
 
 export async function getAuthResult(
   email: string,
@@ -144,4 +153,24 @@ export async function postLevelCompletion(levelId: number, timeMs: number) {
   }
 
   return json;
+}
+
+export async function fetchRating(
+  userId: number,
+  levelId: number,
+  token: string
+) {
+  const headers = createAuthHeaders(token);
+  const requestOptions = {
+    method: "GET",
+    headers,
+  };
+  const response = await fetch(
+    `${serverUrl()}/users/${userId}/ratings/${levelId}`,
+    requestOptions
+  );
+  if (response.status === 404) return undefined;
+  const json = await response.json();
+  const parsed = ratingSchema.parse(json);
+  return parsed.value;
 }

@@ -2,27 +2,30 @@ import { useState } from "react";
 import { uiPaths } from "../../assetPaths";
 
 type StarRatingProps = {
+  rating: number;
   heightPx: number;
   onClick: (clickedRating: number) => void;
 };
 
-export function StarRating({ heightPx, onClick }: StarRatingProps) {
-  const [rating, setRating] = useState(0.5);
-  // const heightPx = 40;
+export function StarRating({ rating, heightPx, onClick }: StarRatingProps) {
+  const [hoveredRating, setHoveredRating] = useState(0.5);
+  const [isHovered, setIsHovered] = useState(false);
 
   function chooseOffset(starIndex: number) {
-    const difference = rating - starIndex;
+    const ratingToUse = isHovered ? hoveredRating : rating;
+    const difference = ratingToUse - starIndex;
     if (difference > 0.5) return 0;
     else if (difference === 0.5) return 50;
     else return 100;
   }
 
   function mouseEnterHoverRegion(regionIndex: number) {
-    setRating((regionIndex + 1) / 2);
+    setIsHovered(true);
+    setHoveredRating((regionIndex + 1) / 2);
   }
 
   function mouseLeaveHoverRegion() {
-    // console.log("leave");
+    setIsHovered(false);
   }
 
   return (

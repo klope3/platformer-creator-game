@@ -7,20 +7,13 @@ import { AuthProvider } from "./components/AuthProvider";
 import { NavBar } from "./components/NavBar/NavBar";
 import { UserInfo } from "./components/UserInfo/UserInfo";
 import { CreateAccount } from "./components/CreateAccount/CreateAccount";
-import { StarRating } from "./components/StarRating/StarRating";
 
 function App() {
-  function clickRating(rating: number) {
-    console.log(rating);
-  }
   return (
     <AuthProvider>
       <NavBar />
       <Routes>
-        <Route
-          path="/"
-          element={<StarRating heightPx={40} onClick={clickRating} />}
-        />
+        <Route path="/" element={<div>Home Page</div>} />
         <Route path="/login" element={<LogIn />} />
         <Route path="/createAccount" element={<CreateAccount />} />
         <Route path="/game">

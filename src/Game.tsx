@@ -7,16 +7,21 @@ import { UIScene } from "./game/scenes/UIScene";
 import { GameOverScene } from "./game/scenes/GameOverScene";
 import { VictoryScene } from "./game/scenes/VictoryScene";
 import { FetchedLevelData } from "../platformer-creator-game-shared/typesFetched";
-import { fetchLevel, postLevelCompletion } from "./fetch";
+import { fetchLevel, fetchRating, postLevelCompletion } from "./fetch";
+import { StarRating } from "./components/StarRating/StarRating";
+import { useAuth } from "./components/AuthProvider";
 
 //? Some unusual techniques are used to allow Phaser and React to share data. See bottom component for info.
 let initializingStarted = false;
+let game: Phaser.Game | null;
 
 export function Game() {
   const { levelId } = useParams();
   const [fetchedLevel, setFetchedLevel] = useState(
     null as FetchedLevelData | null
   );
+  const [rating, setRating] = useState(null as number | null);
+  const { user } = useAuth();
   //TODO: Keep an array of completions in state to show the user their previous completions of this level
 
   async function fetchAndStart() {
@@ -32,8 +37,13 @@ export function Game() {
 
       const level = await fetchLevel(+levelId);
       setFetchedLevel(level);
+      const token = localStorage.getItem("token");
+      if (user && token) {
+        const ratingValue = await fetchRating(user.id, +levelId, token);
+        if (ratingValue !== undefined) setRating(ratingValue);
+      }
 
-      new Phaser.Game({
+      game = new Phaser.Game({
         type: Phaser.AUTO,
         parent: "game-container",
         width: gameWidth,
@@ -73,6 +83,11 @@ export function Game() {
 
   useEffect(() => {
     fetchAndStart();
+    return () => {
+      if (game) {
+        game.destroy(false);
+      }
+    };
   }, []);
 
   return (
@@ -84,6 +99,11 @@ export function Game() {
       {fetchedLevel && (
         <div>
           {fetchedLevel.title}
+          {!user && (
+            <div>
+              You are not logged in. Your play information won't be recorded.
+            </div>
+          )}
           <div>
             Created by{" "}
             <Link to={`/user/${fetchedLevel.userId}`}>
@@ -98,6 +118,19 @@ export function Game() {
             Last updated:{" "}
             {new Date(fetchedLevel.dateUpdated).toLocaleDateString()}
           </div>
+          <div>
+            {fetchedLevel.totalRatings > 0
+              ? `Average rating: ${fetchedLevel.averageRating}/10`
+              : "No ratings yet"}
+          </div>
+          {user && (
+            <StarRating
+              heightPx={40}
+              onClick={() => {}}
+              rating={rating !== null ? rating : 0}
+            />
+          )}
+          <div>Completed {fetchedLevel.totalCompletions} times</div>
         </div>
       )}
     </>
@@ -111,7 +144,7 @@ The Phaser game instance lives inside the "Game" React component. It's created w
 Here's what happens when the game starts:
 1) Game component mounts
 2) useEffect is called, which in turn calls fetchAndStart
-3) fetchAndStart initiates the fetch call and sets initializingStarted to true
+3) fetchAndStart initiates the fetch call; also sets initializingStarted to true and assigns the created game instance to the "game" variable
 4) React unmounts and remounts the component
 5) useEffect calls fetchAndStart again, which exits immediately because intializingStarted is true. This prevents a second async fetchAndStart from executing alongside the first one.
 6) The first fetchAndStart resolves, and the response is parsed.
