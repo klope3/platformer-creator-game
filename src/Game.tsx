@@ -7,7 +7,13 @@ import { UIScene } from "./game/scenes/UIScene";
 import { GameOverScene } from "./game/scenes/GameOverScene";
 import { VictoryScene } from "./game/scenes/VictoryScene";
 import { FetchedLevelData } from "../platformer-creator-game-shared/typesFetched";
-import { fetchLevel, fetchRating, postLevelCompletion } from "./fetch";
+import {
+  fetchLevel,
+  fetchRating,
+  postLevelCompletion,
+  postRating,
+  updateRating,
+} from "./fetch";
 import { StarRating } from "./components/StarRating/StarRating";
 import { useAuth } from "./components/AuthProvider";
 
@@ -22,9 +28,8 @@ export function Game() {
   );
   const [rating, setRating] = useState(null as number | null);
   const { user } = useAuth();
-  //TODO: Keep an array of completions in state to show the user their previous completions of this level
 
-  async function fetchAndStart() {
+  async function fetchLevelStartGame() {
     if (initializingStarted) {
       //set the variable back to false so we can start initialization next time component mounts
       initializingStarted = false;
@@ -37,11 +42,6 @@ export function Game() {
 
       const level = await fetchLevel(+levelId);
       setFetchedLevel(level);
-      const token = localStorage.getItem("token");
-      if (user && token) {
-        const ratingValue = await fetchRating(user.id, +levelId, token);
-        if (ratingValue !== undefined) setRating(ratingValue);
-      }
 
       game = new Phaser.Game({
         type: Phaser.AUTO,
@@ -72,23 +72,50 @@ export function Game() {
     }
   }
 
+  async function tryFetchRating() {
+    const token = localStorage.getItem("token");
+    if (!user || !token || !levelId) return;
+
+    const ratingValue = await fetchRating(user.id, +levelId, token);
+    if (ratingValue !== undefined) setRating(ratingValue);
+  }
+
   async function handleLevelCompletion(levelId: number, timeMs: number) {
     try {
-      //TODO: should store the new completion in state with the others
       postLevelCompletion(levelId, timeMs);
     } catch (error) {
       console.error(error);
     }
   }
 
+  async function handleClickRating(clickedRating: number) {
+    const ratingFetchFn = rating !== null ? updateRating : postRating;
+    const token = localStorage.getItem("token");
+    const ratingToSubmit = clickedRating * 2; //ratings are stored in db as ints, so 5 = 10, 4.5 = 9, etc.
+    if (!user || !levelId || !token) return;
+    const ratingResult = await ratingFetchFn(
+      user.id,
+      +levelId,
+      token,
+      ratingToSubmit
+    );
+    if (!ratingResult) return;
+    setRating(ratingResult.value);
+  }
+
   useEffect(() => {
-    fetchAndStart();
+    fetchLevelStartGame();
     return () => {
       if (game) {
         game.destroy(false);
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    tryFetchRating();
+  }, [user]);
 
   return (
     <>
@@ -126,7 +153,7 @@ export function Game() {
           {user && (
             <StarRating
               heightPx={40}
-              onClick={() => {}}
+              onClick={handleClickRating}
               rating={rating !== null ? rating : 0}
             />
           )}

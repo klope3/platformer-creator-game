@@ -56,6 +56,7 @@ export function StarRating({ rating, heightPx, onClick }: StarRatingProps) {
             }}
             onMouseEnter={() => mouseEnterHoverRegion(i)}
             onMouseLeave={mouseLeaveHoverRegion}
+            onClick={() => onClick((i + 1) / 2)}
           ></div>
         ))}
       </div>

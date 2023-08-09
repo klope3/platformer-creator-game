@@ -169,8 +169,64 @@ export async function fetchRating(
     `${serverUrl()}/users/${userId}/ratings/${levelId}`,
     requestOptions
   );
-  if (response.status === 404) return undefined;
+  if (!response.ok) return undefined;
   const json = await response.json();
   const parsed = ratingSchema.parse(json);
+  parsed.value /= 2; //ratings are stored in db as ints, so 5 = 10, 4.5 = 9, etc.
   return parsed.value;
+}
+
+export async function postRating(
+  userId: number,
+  levelId: number,
+  token: string,
+  value: number
+) {
+  const headers = createAuthHeaders(token, true);
+  const body = JSON.stringify({
+    userId,
+    levelId,
+    value,
+  });
+  const requestOptions = {
+    method: "POST",
+    body,
+    headers,
+  };
+  const response = await fetch(`${serverUrl()}/ratings`, requestOptions);
+  if (!response.ok) {
+    return undefined;
+  }
+  const json = await response.json();
+  const parsed = ratingSchema.parse(json);
+  parsed.value /= 2; //ratings are stored in db as ints, so 5 = 10, 4.5 = 9, etc.
+  return parsed;
+}
+
+export async function updateRating(
+  userId: number,
+  levelId: number,
+  token: string,
+  value: number
+) {
+  const headers = createAuthHeaders(token, true);
+  const body = JSON.stringify({
+    value,
+  });
+  const requestOptions = {
+    method: "PUT",
+    body,
+    headers,
+  };
+  const response = await fetch(
+    `${serverUrl()}/users/${userId}/ratings/${levelId}`,
+    requestOptions
+  );
+  if (!response.ok) {
+    return undefined;
+  }
+  const json = await response.json();
+  const parsed = ratingSchema.parse(json);
+  parsed.value /= 2; //ratings are stored in db as ints, so 5 = 10, 4.5 = 9, etc.
+  return parsed;
 }
