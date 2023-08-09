@@ -16,6 +16,7 @@ import {
 } from "./fetch";
 import { StarRating } from "./components/StarRating/StarRating";
 import { useAuth } from "./components/AuthProvider";
+import { Leaderboard } from "./components/Leaderboard/Leaderboard";
 
 //? Some unusual techniques are used to allow Phaser and React to share data. See bottom component for info.
 let initializingStarted = false;
@@ -28,6 +29,7 @@ export function Game() {
   );
   const [rating, setRating] = useState(null as number | null);
   const { user } = useAuth();
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   async function fetchLevelStartGame() {
     if (initializingStarted) {
@@ -158,6 +160,13 @@ export function Game() {
             />
           )}
           <div>Completed {fetchedLevel.totalCompletions} times</div>
+          <button onClick={() => setShowLeaderboard(true)}>High Scores</button>
+          {showLeaderboard && levelId && (
+            <Leaderboard
+              closeModalCb={() => setShowLeaderboard(false)}
+              levelId={+levelId}
+            />
+          )}
         </div>
       )}
     </>

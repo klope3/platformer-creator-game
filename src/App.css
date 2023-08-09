@@ -8,3 +8,25 @@ nav ul {
 nav li {
   display: block;
 }
+
+.modal-bg {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.modal-parent {
+  height: 100%;
+  display: flex;
+}
+
+.modal-x {
+  position: absolute;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1rem;
+}

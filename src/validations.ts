@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { fetchedLevelResultSchema } from "../platformer-creator-game-shared/typesFetched";
+import {
+  fetchedLevelResultSchema,
+  levelCompletionSchema,
+} from "../platformer-creator-game-shared/typesFetched";
 
 export function parseAuthJson(json: any) {
   const schema = z.object({
@@ -32,4 +35,9 @@ export function parseLevelSearchResultsJson(json: any) {
 export function parseLevelCompletionCallback(cb: any) {
   const schema = z.function().args(z.number(), z.number());
   return schema.parse(cb);
+}
+
+export function parseLevelCompletions(json: any) {
+  const schema = z.array(levelCompletionSchema);
+  return schema.parse(json);
 }

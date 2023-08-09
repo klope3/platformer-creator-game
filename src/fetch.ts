@@ -7,6 +7,7 @@ import {
 import { serverUrl } from "./utility";
 import {
   parseAuthJson,
+  parseLevelCompletions,
   parseLevelSearchResultsJson,
   parseObjWithId,
 } from "./validations";
@@ -153,6 +154,21 @@ export async function postLevelCompletion(levelId: number, timeMs: number) {
   }
 
   return json;
+}
+
+export async function fetchLevelCompletions(levelId: number) {
+  const requestOptions = {
+    method: "GET",
+  };
+
+  const response = await fetch(
+    `${serverUrl()}/levels/${levelId}/completions`,
+    requestOptions
+  );
+  const json = await response.json();
+  const parsed = parseLevelCompletions(json);
+
+  return parsed;
 }
 
 export async function fetchRating(
