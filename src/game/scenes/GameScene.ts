@@ -291,7 +291,7 @@ export class GameScene extends Phaser.Scene {
       const levelCompleteCb = this.game.registry.get("levelCompleteCb");
       const parsedCb = parseLevelCompletionCallback(levelCompleteCb);
       const levelId = this.levelId!; //we could never have reached doGameWin if the level was undefined
-      parsedCb(levelId, this._timeMs);
+      parsedCb(levelId, this._timeMs, this._lives, this._points);
     } catch (error) {
       console.error(
         "There was something wrong with the level completion callback."

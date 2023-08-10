@@ -35,11 +35,15 @@ export function Leaderboard({ closeModalCb, levelId }: LeaderboardProps) {
                 <tr>
                   <th>Username</th>
                   <th>Time</th>
+                  <th>Lives</th>
+                  <th>Score</th>
                 </tr>
                 {completions.map((completion) => (
                   <tr>
                     <td>{completion.user.username}</td>
                     <td>{`${(completion.gameDuration / 1000).toFixed(2)}s`}</td>
+                    <td>{completion.lives}</td>
+                    <td>{completion.score}</td>
                   </tr>
                 ))}
               </tbody>

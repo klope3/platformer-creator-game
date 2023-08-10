@@ -82,9 +82,14 @@ export function Game() {
     if (ratingValue !== undefined) setRating(ratingValue);
   }
 
-  async function handleLevelCompletion(levelId: number, timeMs: number) {
+  async function handleLevelCompletion(
+    levelId: number,
+    timeMs: number,
+    lives: number,
+    score: number
+  ) {
     try {
-      postLevelCompletion(levelId, timeMs);
+      postLevelCompletion(levelId, timeMs, lives, score);
     } catch (error) {
       console.error(error);
     }

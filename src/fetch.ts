@@ -111,7 +111,12 @@ export async function fetchLevelResults() {
   return parseLevelSearchResultsJson(json);
 }
 
-export async function postLevelCompletion(levelId: number, timeMs: number) {
+export async function postLevelCompletion(
+  levelId: number,
+  timeMs: number,
+  lives: number,
+  score: number
+) {
   const token = localStorage.getItem("token");
   if (!token) {
     console.error("Couldn't post level completion, due to a missing token.");
@@ -129,6 +134,8 @@ export async function postLevelCompletion(levelId: number, timeMs: number) {
     userId: parsed.id,
     levelId: levelId,
     completionTime: Math.round(timeMs),
+    lives,
+    score,
   });
 
   const redirect: RequestRedirect = "follow";
