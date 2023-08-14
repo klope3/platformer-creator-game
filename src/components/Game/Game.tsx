@@ -138,7 +138,9 @@ export function Game() {
         <div className="game-info-section">
           <div className="game-info-primary">
             <div className="game-info-header">
-              <div className="game-title">{fetchedLevel.title}</div>
+              <div className="game-title">
+                <h2>{fetchedLevel.title}</h2>
+              </div>
               <div className="game-completion-count">
                 🎮 Completed {fetchedLevel.totalCompletions} times
               </div>

@@ -30,9 +30,11 @@ export function LevelBrowseRow({
     <div className="level-browse-row bump-sm">
       <Link to={`/game/${id}`} className="level-browse-row-image"></Link>
       <div className="level-browse-row-info">
-        <h3>
-          <Link to={`/game/${id}`}>{title}</Link>
-        </h3>
+        {/* <h3> */}
+        <Link to={`/game/${id}`}>
+          <h3>{title}</h3>
+        </Link>
+        {/* </h3> */}
         <div
           className="level-browse-row-description"
           onClick={() => setExpandedDescription(!expandedDescription)}

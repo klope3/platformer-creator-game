@@ -6,6 +6,34 @@
   --neumorph-highlight: rgba(255, 255, 255, 0.423);
 }
 
+* {
+  font-family: "Poppins", sans-serif;
+  font-size: 1rem;
+  /* font-family: "IBM Plex Mono", monospace; */
+}
+
+h1,
+h2,
+h3,
+button {
+  font-family: "Handjet", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 400;
+}
+
+h2 {
+  font-size: 2.75rem;
+}
+
+h3 {
+  font-size: 2rem;
+}
+
 body {
   background-color: var(--alpha-2);
   margin: 0;
@@ -17,6 +45,7 @@ button {
   padding: 10px 20px;
   border-radius: 15px;
   cursor: pointer;
+  font-size: 1.5rem;
 }
 
 button:hover {
@@ -56,24 +85,24 @@ a {
 }
 
 .indent-sm {
-  box-shadow:  inset 5px 5px 10px var(--neumorph-shadow),
-               inset -5px -5px 10px var(--neumorph-highlight);
+  box-shadow: inset 5px 5px 10px var(--neumorph-shadow),
+    inset -5px -5px 10px var(--neumorph-highlight);
 }
 
 .indent-med {
   box-shadow: inset 12px 12px 24px var(--neumorph-shadow),
-            inset -12px -12px 24px var(--neumorph-highlight);
+    inset -12px -12px 24px var(--neumorph-highlight);
 }
 
 .bump-sm,
 button {
-  box-shadow:  5px 5px 10px var(--neumorph-shadow),
-               -5px -5px 10px var(--neumorph-highlight);
+  box-shadow: 5px 5px 10px var(--neumorph-shadow),
+    -5px -5px 10px var(--neumorph-highlight);
 }
 
 .bump-med {
-  box-shadow:  12px 12px 24px var(--neumorph-shadow),
-             -12px -12px 24px var(--neumorph-highlight);
+  box-shadow: 12px 12px 24px var(--neumorph-shadow),
+    -12px -12px 24px var(--neumorph-highlight);
 }
 
 .danger {
