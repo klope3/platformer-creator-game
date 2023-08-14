@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router";
 import "./App.css";
-import { Game } from "./Game";
+import { Game } from "./components/Game/Game";
 import { LogIn } from "./components/LogIn/LogIn";
 import { LevelBrowse } from "./components/LevelBrowse/LevelBrowse";
 import { AuthProvider } from "./components/AuthProvider";
@@ -12,18 +12,20 @@ function App() {
   return (
     <AuthProvider>
       <NavBar />
-      <Routes>
-        <Route path="/" element={<div>Home Page</div>} />
-        <Route path="/login" element={<LogIn />} />
-        <Route path="/createAccount" element={<CreateAccount />} />
-        <Route path="/game">
-          <Route path=":levelId" element={<Game />} />
-        </Route>
-        <Route path="/user">
-          <Route path=":userId" element={<UserInfo />} />
-        </Route>
-        <Route path="/browse" element={<LevelBrowse />} />
-      </Routes>
+      <div className="app-container">
+        <Routes>
+          <Route path="/" element={<div>Home Page</div>} />
+          <Route path="/login" element={<LogIn />} />
+          <Route path="/createAccount" element={<CreateAccount />} />
+          <Route path="/game">
+            <Route path=":levelId" element={<Game />} />
+          </Route>
+          <Route path="/user">
+            <Route path=":userId" element={<UserInfo />} />
+          </Route>
+          <Route path="/browse" element={<LevelBrowse />} />
+        </Routes>
+      </div>
     </AuthProvider>
   );
 }

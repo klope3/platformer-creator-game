@@ -71,3 +71,10 @@ export function submitAuthForm(
     }
   });
 }
+
+export function abbreviateText(text: string, maxLength = 20) {
+  const split = text.split(" ");
+  if (split.length <= 20) return text;
+
+  return split.slice(0, maxLength).join(" ") + " ...";
+}

@@ -1,22 +1,24 @@
 import { Link, useParams } from "react-router-dom";
 import Phaser from "phaser";
 import { useEffect, useState } from "react";
-import { gameHeight, gameWidth, gravity } from "./game/constants";
-import { GameScene } from "./game/scenes/GameScene";
-import { UIScene } from "./game/scenes/UIScene";
-import { GameOverScene } from "./game/scenes/GameOverScene";
-import { VictoryScene } from "./game/scenes/VictoryScene";
-import { FetchedLevelData } from "../platformer-creator-game-shared/typesFetched";
+import { gameHeight, gameWidth, gravity } from "../../game/constants";
+import { GameScene } from "../../game/scenes/GameScene";
+import { UIScene } from "../../game/scenes/UIScene";
+import { GameOverScene } from "../../game/scenes/GameOverScene";
+import { VictoryScene } from "../../game/scenes/VictoryScene";
+import { FetchedLevelData } from "../../../platformer-creator-game-shared/typesFetched";
 import {
   fetchLevel,
   fetchRating,
   postLevelCompletion,
   postRating,
   updateRating,
-} from "./fetch";
-import { StarRating } from "./components/StarRating/StarRating";
-import { useAuth } from "./components/AuthProvider";
-import { Leaderboard } from "./components/Leaderboard/Leaderboard";
+} from "../../fetch";
+import { StarRating } from "../StarRating/StarRating";
+import { useAuth } from "../AuthProvider";
+import { Leaderboard } from "../Leaderboard/Leaderboard";
+import "./Game.css";
+import { abbreviateText } from "../../utility";
 
 //? Some unusual techniques are used to allow Phaser and React to share data. See bottom component for info.
 let initializingStarted = false;
@@ -30,6 +32,7 @@ export function Game() {
   const [rating, setRating] = useState(null as number | null);
   const { user } = useAuth();
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   async function fetchLevelStartGame() {
     if (initializingStarted) {
@@ -124,55 +127,74 @@ export function Game() {
     tryFetchRating();
   }, [user]);
 
+  const avgRatingOutOf5 =
+    fetchedLevel && (fetchedLevel.averageRating / 2).toFixed(2);
   return (
     <>
-      <Link to="/">Home</Link>
       <div style={{ width: gameWidth, height: gameHeight, overflow: "hidden" }}>
         <div id="game-container"></div>
       </div>
       {fetchedLevel && (
-        <div>
-          {fetchedLevel.title}
-          {!user && (
-            <div>
-              You are not logged in. Your play information won't be recorded.
+        <div className="game-info-section">
+          <div className="game-info-primary">
+            <div className="game-info-header">
+              <div className="game-title">{fetchedLevel.title}</div>
+              <div className="game-completion-count">
+                🎮 Completed {fetchedLevel.totalCompletions} times
+              </div>
             </div>
-          )}
-          <div>
-            Created by{" "}
-            <Link to={`/user/${fetchedLevel.userId}`}>
-              {fetchedLevel.user.username}
-            </Link>
+            <div>
+              Created by{" "}
+              <Link className="user-link" to={`/user/${fetchedLevel.userId}`}>
+                {fetchedLevel.user.username}
+              </Link>
+            </div>
+            <div>
+              Created on:{" "}
+              {new Date(fetchedLevel.dateCreated).toLocaleDateString()}
+            </div>
+            <div>
+              Last updated:{" "}
+              {new Date(fetchedLevel.dateUpdated).toLocaleDateString()}
+            </div>
+            <div
+              className="game-description indent-sm"
+              onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+            >
+              {descriptionExpanded
+                ? fetchedLevel.description
+                : abbreviateText(fetchedLevel.description)}
+            </div>
           </div>
-          <div>
-            Created on:{" "}
-            {new Date(fetchedLevel.dateCreated).toLocaleDateString()}
+          <div className="game-info-secondary">
+            {!user && (
+              <div className="danger game-login-warning">
+                You are not logged in. Your play information won't be recorded.
+              </div>
+            )}
+            {user && (
+              <StarRating
+                heightPx={40}
+                onClick={handleClickRating}
+                rating={rating !== null ? rating : 0}
+              />
+            )}
+            <div>
+              {fetchedLevel.totalRatings > 0
+                ? `Average rating: ${avgRatingOutOf5}/5`
+                : "No ratings yet"}
+            </div>
+            <button onClick={() => setShowLeaderboard(true)}>
+              High Scores
+            </button>
           </div>
-          <div>
-            Last updated:{" "}
-            {new Date(fetchedLevel.dateUpdated).toLocaleDateString()}
-          </div>
-          <div>
-            {fetchedLevel.totalRatings > 0
-              ? `Average rating: ${fetchedLevel.averageRating}/10`
-              : "No ratings yet"}
-          </div>
-          {user && (
-            <StarRating
-              heightPx={40}
-              onClick={handleClickRating}
-              rating={rating !== null ? rating : 0}
-            />
-          )}
-          <div>Completed {fetchedLevel.totalCompletions} times</div>
-          <button onClick={() => setShowLeaderboard(true)}>High Scores</button>
-          {showLeaderboard && levelId && (
-            <Leaderboard
-              closeModalCb={() => setShowLeaderboard(false)}
-              levelId={+levelId}
-            />
-          )}
         </div>
+      )}
+      {showLeaderboard && levelId && (
+        <Leaderboard
+          closeModalCb={() => setShowLeaderboard(false)}
+          levelId={+levelId}
+        />
       )}
     </>
   );

@@ -1,10 +1,11 @@
 .leaderboard-modal {
   background-color: black;
   color: white;
-  width: 700px;
+  width: 900px;
   margin: auto;
   padding: 30px;
   position: relative;
+  border-radius: 15px;
 }
 
 .leaderboard-modal table {
