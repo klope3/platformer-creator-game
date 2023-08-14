@@ -1,5 +1,9 @@
 import jwtDecode from "jwt-decode";
-import { parseObjWithId } from "./validations";
+import {
+  checkValidPassword,
+  parseObjWithId,
+  validPasswordMessage,
+} from "./validations";
 import { getAuthResult } from "./fetch";
 import { NavigateFunction } from "react-router-dom";
 import { User } from "../platformer-creator-game-shared/typesFetched";
@@ -16,10 +20,12 @@ export function getDataFromAuthForm(form: HTMLFormElement) {
   const username = data.get("username");
   const email = data.get("email");
   const password = data.get("password");
+  const confirmPassword = data.get("confirmPassword");
   return {
     username,
     email,
     password,
+    confirmPassword,
   };
 }
 
@@ -38,7 +44,7 @@ export function submitAuthForm(
 ) {
   e.preventDefault();
   //get and validate form data
-  const { username, email, password } = getDataFromAuthForm(
+  const { username, email, password, confirmPassword } = getDataFromAuthForm(
     e.target as HTMLFormElement
   );
   if (
@@ -48,6 +54,16 @@ export function submitAuthForm(
   ) {
     errorMessageCb("Please fill out required fields.");
     return;
+  }
+  if (createAccount) {
+    if (!checkValidPassword(password)) {
+      errorMessageCb(validPasswordMessage);
+      return;
+    }
+    if (password !== confirmPassword) {
+      errorMessageCb("The passwords must match.");
+      return;
+    }
   }
 
   const usernameArg =

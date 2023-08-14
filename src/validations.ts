@@ -41,3 +41,9 @@ export function parseLevelCompletions(json: any) {
   const schema = z.array(levelCompletionSchema);
   return schema.parse(json);
 }
+
+export const checkValidPassword = (input: string) =>
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+]).{8,20}$/g.test(input);
+
+export const validPasswordMessage =
+  "Password must be 8-20 characters, including at least one capital letter, at least one small letter, one number and one special character - !@#$%^&*()_+";

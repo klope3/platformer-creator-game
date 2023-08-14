@@ -9,7 +9,7 @@
 * {
   font-family: "Poppins", sans-serif;
   font-size: 1rem;
-  /* font-family: "IBM Plex Mono", monospace; */
+  box-sizing: border-box;
 }
 
 h1,
@@ -119,4 +119,24 @@ button {
 
 .user-link:hover {
   background-color: rgba(0, 0, 0, 0.656);
+}
+
+form label {
+  display: block;
+}
+
+form input {
+  width: 100%;
+  padding: 5px;
+}
+
+form button {
+  width: 100%;
+  margin-top: 15px;
+}
+
+.auth-form {
+  max-width: 300px;
+  margin: auto;
+  margin-top: 200px;
 }

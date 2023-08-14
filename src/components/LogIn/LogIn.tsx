@@ -18,7 +18,7 @@ export function LogIn() {
 
   return (
     <>
-      <form onSubmit={clickLogIn}>
+      <form className="auth-form" onSubmit={clickLogIn}>
         <div>
           <label htmlFor="email">Email</label>
           <input type="email" name="email" id="email" />

@@ -17,7 +17,7 @@ export function CreateAccount() {
   //TODO: Add field for confirming password
   return (
     <>
-      <form onSubmit={clickCreateAccount}>
+      <form className="auth-form" onSubmit={clickCreateAccount}>
         <div>
           <label htmlFor="username">Username</label>
           <input type="text" name="username" id="username" required />
@@ -29,6 +29,10 @@ export function CreateAccount() {
         <div>
           <label htmlFor="password">Password</label>
           <input type="password" name="password" id="password" required />
+        </div>
+        <div>
+          <label htmlFor="confirmPassword">Confirm Password</label>
+          <input type="password" name="confirmPassword" id="confirmPassword" />
         </div>
         {error && <div style={{ color: "red" }}>{error}</div>}
         <div>
