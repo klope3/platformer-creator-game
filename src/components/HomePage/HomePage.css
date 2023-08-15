@@ -1,0 +1,20 @@
+.hero {
+  display: block;
+  width: 600px;
+  margin: auto;
+}
+
+.home-page a {
+  display: block;
+  font-size: 3rem;
+  padding: 15px;
+  border-radius: 15px;
+  margin: auto;
+  width: 200px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.home-page a:hover {
+  background-color: rgba(255, 255, 255, 0.133);
+}

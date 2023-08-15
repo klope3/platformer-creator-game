@@ -7,6 +7,7 @@ import { AuthProvider } from "./components/AuthProvider";
 import { NavBar } from "./components/NavBar/NavBar";
 import { UserInfo } from "./components/UserInfo/UserInfo";
 import { CreateAccount } from "./components/CreateAccount/CreateAccount";
+import { HomePage } from "./components/HomePage/HomePage";
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
       <NavBar />
       <div className="app-container">
         <Routes>
-          <Route path="/" element={<div>Home Page</div>} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LogIn />} />
           <Route path="/createAccount" element={<CreateAccount />} />
           <Route path="/game">

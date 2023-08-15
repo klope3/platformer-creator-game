@@ -10,12 +10,14 @@ export function NavBar() {
     <nav>
       <ul>
         <li>
-          <Link className="bump-sm" to="/">
-            Home
-          </Link>
+          <Link
+            className="portal"
+            style={{ backgroundImage: "url('/assets/k_logo.png')" }}
+            to="/"
+          ></Link>
         </li>
         <li>
-          <Link className="bump-sm" to="/browse">
+          <Link className="bump-sm nav-link" to="/browse">
             Browse Levels
           </Link>
         </li>
@@ -24,12 +26,12 @@ export function NavBar() {
         {!user && (
           <>
             <li>
-              <Link className="bump-sm" to="/createAccount">
+              <Link className="bump-sm nav-link" to="/createAccount">
                 Sign Up
               </Link>
             </li>
             <li>
-              <Link className="bump-sm" to="/login">
+              <Link className="bump-sm nav-link" to="/login">
                 Log In
               </Link>
             </li>
@@ -39,14 +41,14 @@ export function NavBar() {
           <>
             <li className="nav-welcome-text">Welcome, {user.username}</li>
             <li>
-              <Link className="bump-sm" to={`/user/${user.id}`}>
+              <Link className="bump-sm nav-link" to={`/user/${user.id}`}>
                 My Account
               </Link>
             </li>
             <li>
               <Link
                 to="/login"
-                className="bump-sm"
+                className="bump-sm nav-link"
                 onClick={() => {
                   localStorage.removeItem("token");
                   // navigate("/login");

@@ -8,6 +8,7 @@ export function LevelBrowse() {
     [] as FetchedLevelResult[]
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null as string | null);
 
   async function getResults() {
     try {
@@ -16,6 +17,9 @@ export function LevelBrowse() {
       setIsLoading(false);
     } catch (error) {
       console.error(error);
+      setError(
+        "There was an issue getting data from the server. Try again later."
+      );
       setIsLoading(false);
     }
   }
@@ -29,6 +33,7 @@ export function LevelBrowse() {
       {isLoading && <div>Loading...</div>}
       {!isLoading &&
         searchResults.map((result) => <LevelBrowseRow fetchedLevel={result} />)}
+      {error && <div className="danger">{error}</div>}
     </div>
   );
 }

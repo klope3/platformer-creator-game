@@ -27,7 +27,7 @@ export function LogIn() {
           <label htmlFor="password">Password</label>
           <input type="password" name="password" id="password" />
         </div>
-        {error && <div style={{ color: "red" }}>{error}</div>}
+        {error && <div className="danger">{error}</div>}
         <button type="submit">Log In</button>
       </form>
     </>

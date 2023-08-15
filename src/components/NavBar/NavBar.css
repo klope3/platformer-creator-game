@@ -1,6 +1,6 @@
 nav {
   background-color: var(--alpha-1);
-  padding: 10px;
+  padding: 5px;
   margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
@@ -11,21 +11,29 @@ nav ul {
   padding: 0;
   display: flex;
   gap: 15px;
+  align-items: center;
 }
 
 nav li {
   display: block;
 }
 
-nav a {
+.nav-link {
   padding: 10px 20px;
   border-radius: 15px;
 }
 
-nav a:hover {
+.nav-link:hover {
   background-color: rgba(255, 255, 255, 0.129);
 }
 
 .nav-welcome-text {
   margin-right: 15px;
+}
+
+.portal {
+  display: block;
+  width: 40px;
+  height: 40px;
+  background-size: cover;
 }

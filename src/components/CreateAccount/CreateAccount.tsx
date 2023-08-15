@@ -34,7 +34,7 @@ export function CreateAccount() {
           <label htmlFor="confirmPassword">Confirm Password</label>
           <input type="password" name="confirmPassword" id="confirmPassword" />
         </div>
-        {error && <div style={{ color: "red" }}>{error}</div>}
+        {error && <div className="danger">{error}</div>}
         <div>
           <button type="submit">Sign Up</button>
         </div>
