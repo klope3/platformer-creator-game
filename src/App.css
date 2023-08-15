@@ -1,0 +1,143 @@
+:root {
+  --alpha-1: rgb(92, 112, 71);
+  --alpha-2: rgb(136, 176, 95);
+
+  --neumorph-shadow: rgba(0, 0, 0, 0.423);
+  --neumorph-highlight: rgba(255, 255, 255, 0.423);
+}
+
+* {
+  font-family: "Poppins", sans-serif;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+button,
+.pixel-font {
+  font-family: "Handjet", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 400;
+}
+
+h2 {
+  font-size: 2.75rem;
+}
+
+h3 {
+  font-size: 2rem;
+}
+
+body {
+  background-color: var(--alpha-2);
+  margin: 0;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+button:hover {
+  background-color: rgba(255, 255, 255, 0.112);
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+.app-container {
+  max-width: 800px;
+  margin: auto;
+}
+
+.modal-bg {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.modal-parent {
+  height: 100%;
+  display: flex;
+}
+
+.modal-x {
+  position: absolute;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1rem;
+}
+
+.indent-sm {
+  box-shadow: inset 5px 5px 10px var(--neumorph-shadow),
+    inset -5px -5px 10px var(--neumorph-highlight);
+}
+
+.indent-med {
+  box-shadow: inset 12px 12px 24px var(--neumorph-shadow),
+    inset -12px -12px 24px var(--neumorph-highlight);
+}
+
+.bump-sm,
+button {
+  box-shadow: 5px 5px 10px var(--neumorph-shadow),
+    -5px -5px 10px var(--neumorph-highlight);
+}
+
+.bump-med {
+  box-shadow: 12px 12px 24px var(--neumorph-shadow),
+    -12px -12px 24px var(--neumorph-highlight);
+}
+
+.danger {
+  color: rgb(189, 0, 0);
+  font-weight: bold;
+}
+
+.user-link {
+  padding: 5px 10px;
+  background-color: rgba(0, 0, 0, 0.304);
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.user-link:hover {
+  background-color: rgba(0, 0, 0, 0.656);
+}
+
+form label {
+  display: block;
+}
+
+form input {
+  width: 100%;
+  padding: 5px;
+}
+
+form button {
+  width: 100%;
+  margin-top: 15px;
+}
+
+.auth-form {
+  max-width: 300px;
+  margin: auto;
+  margin-top: 200px;
+}

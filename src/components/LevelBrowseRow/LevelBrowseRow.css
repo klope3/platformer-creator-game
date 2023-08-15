@@ -1,0 +1,36 @@
+.level-browse-row {
+  display: flex;
+  border-radius: 15px;
+  margin: 25px 0;
+  padding: 15px;
+  gap: 10px;
+}
+
+.level-browse-row h3 {
+  margin-top: 0
+}
+
+.level-browse-row-image {
+  width: 140px;
+  height: 140px;
+  background-image: url("/assets/play_icon.png");
+  background-size: cover;
+  image-rendering: pixelated;
+  transition: 0.1s;
+}
+
+.level-browse-row-image:hover {
+  scale: 105%;
+}
+
+.level-browse-row-info {
+  flex: 1;
+}
+
+.level-browse-row-description {
+  background-color: rgba(0, 0, 0, 0.137);
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}

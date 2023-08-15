@@ -1,0 +1,23 @@
+.leaderboard-modal {
+  background-color: black;
+  color: white;
+  width: 900px;
+  margin: auto;
+  padding: 30px;
+  position: relative;
+  border-radius: 15px;
+}
+
+.leaderboard-modal table {
+  width: 100%;
+}
+
+.leaderboard-modal caption {
+  font-size: 1.5rem;
+}
+
+.leaderboard-x {
+  color: white;
+  top: 15px;
+  right: 15px;
+}
