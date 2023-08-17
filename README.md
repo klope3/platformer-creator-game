@@ -1,5 +1,5 @@
 <a name="top"></a>
-![Hero Image](https://github.com/klope3/platformer-creator-game/blob/master/public/assets/hero_sm.png)
+![Hero Image](https://github.com/klope3/platformer-creator-game/blob/master/public/assets/hero_sm.png)  
 Kyoobo is a simple 2D platformer game inspired by classic Mario.
 ## Table of Contents
 - [Introduction](#top)
