@@ -10,8 +10,15 @@ Kyoobo is a simple 2D platformer game inspired by classic Mario.
 - [Future Plans](#future-plans)
 - [Keep Exploring](#keep-exploring)
 ## Gameplay
+![Basic movement](https://github.com/klope3/platformer-creator-game/blob/master/public/assets/gif1.gif)  
 Run left and right with the right and left arrow keys. Jump with the up arrow key.
+  
+  
+![Kill enemies](https://github.com/klope3/platformer-creator-game/blob/master/public/assets/gif2.gif)  
 Kill enemies by landing on them. If you touch them from any other angle, you lose a life and restart the level.
+  
+  
+![Reach the exit](https://github.com/klope3/platformer-creator-game/blob/master/public/assets/gif3.gif)  
 Reach the exit to beat the level!
 ## Link
 (hosted version coming soon!)
