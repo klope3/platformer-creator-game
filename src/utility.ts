@@ -6,7 +6,6 @@ import {
 } from "./validations";
 import { getAuthResult } from "./fetch";
 import { NavigateFunction } from "react-router-dom";
-import { User } from "../platformer-creator-game-shared/typesFetched";
 import { UserAuthData } from "./components/AuthProvider";
 
 export function getIdFromJwtToken(token: any) {

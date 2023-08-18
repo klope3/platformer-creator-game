@@ -1,10 +1,9 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../AuthProvider";
 import "./NavBar.css";
 
 export function NavBar() {
   const { user, setUser } = useAuth();
-  // const navigate = useNavigate();
 
   return (
     <nav>
