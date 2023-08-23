@@ -20,8 +20,8 @@ import { Leaderboard } from "../Leaderboard/Leaderboard";
 import "./Game.css";
 import { abbreviateText } from "../../utility";
 
-//? Some unusual techniques are used to allow Phaser and React to share data. See bottom component for info.
-let initializingStarted = false;
+// ? Some unusual techniques are used to allow Phaser and React to share data in development mode. See bottom component for info.
+// let initializingStarted = false;
 let game: Phaser.Game | null;
 
 export function Game() {
@@ -35,13 +35,13 @@ export function Game() {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   async function fetchLevelStartGame() {
-    if (initializingStarted) {
-      //set the variable back to false so we can start initialization next time component mounts
-      initializingStarted = false;
-      console.log("initialization already started, skipping");
-      return;
-    }
-    initializingStarted = true;
+    // if (initializingStarted) {
+    //set the variable back to false so we can start initialization next time component mounts
+    //   initializingStarted = false;
+    //   console.log("initialization already started, skipping");
+    //   return;
+    // }
+    // initializingStarted = true;
     console.log("starting initialization");
     try {
       if (!levelId || isNaN(+levelId))
