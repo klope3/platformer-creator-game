@@ -20,8 +20,6 @@ import { Leaderboard } from "../Leaderboard/Leaderboard";
 import "./Game.css";
 import { abbreviateText } from "../../utility";
 
-//? Some unusual techniques are used to allow Phaser and React to share data. See bottom component for info.
-let initializingStarted = false;
 let game: Phaser.Game | null;
 
 export function Game() {
@@ -35,17 +33,13 @@ export function Game() {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   async function fetchLevelStartGame() {
-    if (initializingStarted) {
-      //set the variable back to false so we can start initialization next time component mounts
-      initializingStarted = false;
-      return;
-    }
-    initializingStarted = true;
+    console.log("starting initialization");
     try {
       if (!levelId || isNaN(+levelId))
         throw new Error("Invalid level id " + levelId);
 
       const level = await fetchLevel(+levelId);
+      console.log("Done fetching level");
       setFetchedLevel(level);
 
       game = new Phaser.Game({
@@ -201,20 +195,3 @@ export function Game() {
     </>
   );
 }
-
-/*
----Starting the game
-The Phaser game instance lives inside the "Game" React component. It's created when the component first mounts. But React always mounts components twice, so we need to stop the game from initializing twice. To further complicate matters, a fetch call getting level data from the DB must be resolved before the game is initialized; this data needs to be used both in the React UI and in the game itself; and when the player wins (which the game itself must report), we need to use this data in another fetch call to post data about the level completion.
-
-Here's what happens when the game starts:
-1) Game component mounts
-2) useEffect is called, which in turn calls fetchAndStart
-3) fetchAndStart initiates the fetch call; also sets initializingStarted to true and assigns the created game instance to the "game" variable
-4) React unmounts and remounts the component
-5) useEffect calls fetchAndStart again, which exits immediately because intializingStarted is true. This prevents a second async fetchAndStart from executing alongside the first one.
-6) The first fetchAndStart resolves, and the response is parsed.
-7) Assuming no errors, the game is initialized. To allow the game to build the level from the fetched data, we use the game's preboot callback to add the data to the game registry. We also add a callback to the registry, to be called when the level is completed.
-8) The player can start playing.
-
-This complicated sequence is not ideal, and in fact, it breaks the React rule of keeping components pure (by relying on and changing the external initializingStarted variable). But the learning resources available for using Phaser and React together are very limited, and adding data fetching into the mix makes the use case even more niche. This is simply the solution I was able to come up with in the absence of better/best practices relevant to the situation.
- */
