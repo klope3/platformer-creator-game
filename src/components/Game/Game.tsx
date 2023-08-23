@@ -38,14 +38,17 @@ export function Game() {
     if (initializingStarted) {
       //set the variable back to false so we can start initialization next time component mounts
       initializingStarted = false;
+      console.log("initialization already started, skipping");
       return;
     }
     initializingStarted = true;
+    console.log("starting initialization");
     try {
       if (!levelId || isNaN(+levelId))
         throw new Error("Invalid level id " + levelId);
 
       const level = await fetchLevel(+levelId);
+      console.log("Done fetching level");
       setFetchedLevel(level);
 
       game = new Phaser.Game({
