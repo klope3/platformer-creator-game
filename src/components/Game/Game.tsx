@@ -33,13 +33,11 @@ export function Game() {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   async function fetchLevelStartGame() {
-    console.log("starting initialization");
     try {
       if (!levelId || isNaN(+levelId))
         throw new Error("Invalid level id " + levelId);
 
       const level = await fetchLevel(+levelId);
-      console.log("Done fetching level");
       setFetchedLevel(level);
 
       game = new Phaser.Game({
