@@ -13,6 +13,10 @@ function App() {
   return (
     <AuthProvider>
       <NavBar />
+      <div className="mobile-warning">
+        Sorry, but mobile devices are not currently supported. Check back in the
+        future!
+      </div>
       <div className="app-container">
         <Routes>
           <Route path="/" element={<HomePage />} />
