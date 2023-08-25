@@ -141,3 +141,16 @@ form button {
   margin: auto;
   margin-top: 200px;
 }
+
+.mobile-warning {
+  background-color: red;
+  text-align: center;
+  padding: 10px;
+  display: none;
+}
+
+@media screen and (max-width: 1024px) {
+  .mobile-warning {
+    display: block;
+  }
+}
